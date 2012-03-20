@@ -4,10 +4,6 @@
             [jonase.kibit.core :as kibit])
   (:import [java.io File]))
 
-(set! *print-meta* true)
-(set! *print-meta* false)
-
-
 ;;Taken from clojure.tools.namespace
 (defn cljx-source-file?
   "Returns true if file is a normal file with a .cljx extension."
@@ -24,7 +20,6 @@ Returns a sequence of File objects, in breadth-first sort order."
            (filter cljx-source-file? (file-seq dir))))
 
 
-
 (defn process [filename]
   (let [{:keys [cljs clj]} (reduce (fn [cur [func args]] (apply func cur args))
                                    {:cljx (toplevel-forms-in filename)}
@@ -35,8 +30,18 @@ Returns a sequence of File objects, in breadth-first sort order."
     (spit (str output-base "clj") (str warning (string/join "\n" clj)))
     (spit (str output-base "cljs") (str warning (string/join "\n" cljs)))))
 
-(process "test/cljx/testns/core.cljx")
+
+(comment
+  
+  (process "test/cljx/testns/core.cljx")
 
 
-(kibit/check-file "test/cljx/testns/core.cljx" :rules cljs-rules)
+
+  (kibit/check-file "test/cljx/testns/core.cljx"
+                    :rules (mapcat logic/prep [cljs-rules])
+                    :reporter (fn [{:keys [line expr alt]}] (println alt)))
+
+
+
+  )
 

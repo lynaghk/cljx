@@ -2,11 +2,11 @@
   (:require [clojure.core.logic :as logic]))
 
 (logic/defne clj? [expr]
-  ([var]
+  ([[_ var . _]]
      (logic/project [var]
-                    (logic/pred var #(= true (:clj (meta %)))))))
+                    (logic/pred var #(-> % meta :clj (= true))))))
 
 (logic/defne cljs? [expr]
-  ([var]
+  ([[_ var . _]]
      (logic/project [var]
-                    (logic/pred var #(= true (:cljs (meta %)))))))
+                    (logic/pred var #(-> % meta :cljs (= true))))))

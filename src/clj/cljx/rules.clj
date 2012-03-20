@@ -6,5 +6,5 @@
   
   [clojure.lang.IFn IFn]
   
-  [?x [clj?] nil])
+  [?x [clj?] ""])
 
