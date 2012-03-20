@@ -1,22 +1,11 @@
-(ns cljx
-  (:require [clojure.java.io :as io]
-            [clojure.string :as string])
-  (:import [clojure.lang LineNumberingPushbackReader]
-           [java.io File]))
-
+(ns scratch
+  (:use [cljx.rules :only [cljs-rules]] :reload-all)
+  (:require [clojure.string :as string]
+            [jonase.kibit.core :as kibit])
+  (:import [java.io File]))
 
 (set! *print-meta* true)
 (set! *print-meta* false)
-
-(def src-dir (File. "src/"))
-
-(defonce middleware (atom []))
-(defn add-middleware!
-  "Add a middleware function to the compile chain"
-  [func & args]
-  (swap! middleware conj [func args]))
-
-
 
 
 ;;Taken from clojure.tools.namespace
@@ -35,36 +24,6 @@ Returns a sequence of File objects, in breadth-first sort order."
            (filter cljx-source-file? (file-seq dir))))
 
 
-;;Some code taken from Kibit.
-(defn read-ns
-  "Generate a lazy sequence of top level forms from a
-  LineNumberingPushbackReader"
-  [^LineNumberingPushbackReader r]
-  (lazy-seq
-   (let [form (read r false ::eof)]
-     (when-not (= form ::eof)
-       (cons form (read-ns r))))))
-
-(defn toplevel-forms-in [filename]
-  (let [reader (io/reader (java.io.File. filename))]
-    (read-ns (LineNumberingPushbackReader. reader))))
-
-
-(defn sieve [m]
-  (let [forms (:cljx m)]
-    (merge m
-           {:cljs (filter #(or (= (-> % meta :cljs) true)
-                               (not= (-> % meta :clj) true))
-                          forms)
-
-            :clj (filter #(or (= (-> % meta :clj) true)
-                              (not= (-> % meta :cljs) true))
-                         forms)})))
-
-
-
-
-
 
 (defn process [filename]
   (let [{:keys [cljs clj]} (reduce (fn [cur [func args]] (apply func cur args))
@@ -76,31 +35,8 @@ Returns a sequence of File objects, in breadth-first sort order."
     (spit (str output-base "clj") (str warning (string/join "\n" clj)))
     (spit (str output-base "cljs") (str warning (string/join "\n" cljs)))))
 
-(add-middleware! sieve)
-(process "test-file.cljx")
+(process "test/cljx/testns/core.cljx")
 
 
+(kibit/check-file "test/cljx/testns/core.cljx" :rules cljs-rules)
 
-
-;; `tree-seq` returns a lazy-seq of nodes for a tree.
-;; Given an expression, we can then match rules against its pieces.
-;; This is like using `clojure.walk` with `identity`:
-;;
-;;     user=> (expr-seq '(if (pred? x) (inc x) x))
-;;     ((if (pred? x) (inc x) x)
-;;      if
-;;      (pred? x)
-;;      pred?
-;;      x
-;;      (inc x)
-;;      inc
-;;      x
-;;      x)`
-;;
-(defn expr-seq
-  "Given an expression (any piece of Clojure data), return a lazy (depth-first)
-  sequence of the expr and all its sub-expressions"
-  [expr]
-  (tree-seq sequential?
-            seq
-            expr))

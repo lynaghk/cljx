@@ -5,4 +5,6 @@
   :dependencies [[org.clojure/clojure "1.3.0"]
 
                  [org.clojure/core.logic "0.6.8"]
-                 [org.clojure/tools.namespace "0.1.2"]])
+                 [org.clojure/tools.namespace "0.1.2"]]
+
+  :source-path "src/clj")
