@@ -1,4 +1,4 @@
-(ns test-file)
+(ns test.core)
 
 ^:cljs (defn p [x]
          (.log js/console x))

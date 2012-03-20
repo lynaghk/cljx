@@ -1,16 +1,41 @@
 (ns cljx
   (:require [clojure.java.io :as io]
             [clojure.string :as string])
-  (:import [clojure.lang LineNumberingPushbackReader]))
+  (:import [clojure.lang LineNumberingPushbackReader]
+           [java.io File]))
 
 
 (set! *print-meta* true)
 (set! *print-meta* false)
 
+(def src-dir (File. "src/"))
+
+(defonce middleware (atom []))
+(defn add-middleware!
+  "Add a middleware function to the compile chain"
+  [func & args]
+  (swap! middleware conj [func args]))
+
+
+
+
+;;Taken from clojure.tools.namespace
+(defn cljx-source-file?
+  "Returns true if file is a normal file with a .cljx extension."
+  [^File file]
+  (and (.isFile file)
+       (.endsWith (.getName file) ".cljx")))
+
+(defn find-cljx-sources-in-dir
+  "Searches recursively under dir for CLJX files.
+Returns a sequence of File objects, in breadth-first sort order."
+  [^File dir]
+  ;; Use sort by absolute path to get breadth-first search.
+  (sort-by #(.getAbsolutePath ^File %)
+           (filter cljx-source-file? (file-seq dir))))
 
 
 ;;Some code taken from Kibit.
-
 (defn read-ns
   "Generate a lazy sequence of top level forms from a
   LineNumberingPushbackReader"
@@ -19,8 +44,6 @@
    (let [form (read r false ::eof)]
      (when-not (= form ::eof)
        (cons form (read-ns r))))))
-
-
 
 (defn toplevel-forms-in [filename]
   (let [reader (io/reader (java.io.File. filename))]
@@ -38,11 +61,6 @@
                               (not= (-> % meta :cljs) true))
                          forms)})))
 
-(defonce middleware (atom []))
-(defn add-middleware!
-  "Add a middleware function to the compile chain"
-  [func & args]
-  (swap! middleware conj [func args]))
 
 
 
