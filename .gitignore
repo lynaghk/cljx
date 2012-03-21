@@ -1,2 +1,3 @@
 lib/
 .lein*
+test/generated

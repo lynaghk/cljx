@@ -6,5 +6,5 @@
   
   [clojure.lang.IFn IFn]
   
-  [?x [clj?] ""])
+  [?x [clj?] :cljx.core/exclude])
 
