@@ -6,5 +6,5 @@
   
   [clojure.lang.IFn IFn]
   
-  [?x [clj?] :cljx.core/exclude])
+  [?x :cljx.core/exclude :when [clj?]])
 
