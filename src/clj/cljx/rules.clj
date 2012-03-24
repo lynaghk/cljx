@@ -1,5 +1,5 @@
 (ns cljx.rules
-  (:use [jonase.kibit.rules.util :only [defrules]]
+  (:use [kibit.rules.util :only [defrules]]
         [cljx.guards :only [clj? cljs?]]))
 
 (defrules cljs-rules

@@ -4,8 +4,8 @@
         :reload-all)
   (:require [clojure.string :as string]
             [clojure.core.logic :as logic]
-            [jonase.kibit.core :as kibit]
-            [cljx.core :as cljx.core] :reload-all)
+            kibit.check
+            cljx.core :reload-all)
   (:import [java.io File]))
 
 ;;Taken from clojure.tools.namespace
@@ -46,10 +46,50 @@ Returns a sequence of File objects, in breadth-first sort order."
                                 :rules (mapcat logic/prep [cljs-rules])
                                 :reporter (fn [{:keys [line expr alt]}]
                                             (prn alt))
-                                :simplify-guard (fn [m]
-                                                  (when (not= (:alt m) :cljx.core/exclude)
-                                                    m)))))))
+                                )))))
 
+  (use '[kibit.rules.util :only [defrules]])
+
+
+  (let [test1 '(reify
+                 Prot1
+                 (methodA [_ x] x)
+
+                 Prot2
+                 (methodB [_ x] x))]
+
+
+
+    (defrules test-rules
+      [Prot1 HyphenatedProt]
+      [(reify HyphenatedProt (methodA . ?f) . ?rest)
+       (reify HyphenatedProt (method-A . ?f) . ?rest)]
+
+      [(reify . ?b Prot2 (methodB . ?f) . ?rest)
+       (reify . ?b Prot2 (method-B . ?f) . ?rest)]
+      )
+
+    (kibit.core/simplify test1
+                         (mapcat logic/prep [test-rules])))
 
   )
 
+
+(logic/run* [q]
+            (logic/fresh [pat guards alt]
+                         (logic/membero [pat guards alt] [(logic/prep '[(start . ?b thing . ?a)
+                                                                        []
+                                                                        ?b])])
+                         (logic/== q alt) 
+                         (logic/== pat )))
+
+
+(use '[clojure.core.logic :only [run* fresh matche == != membero]])
+
+(run* [q]
+  (fresh [a]
+         (== a '(start grr grr grr thing meh meh))
+
+    (matche [a]
+            ([ [start . ?x . thing . ?rest] ]
+             (== q ["two" ?x])))))
