@@ -1,4 +1,8 @@
-(ns test.core)
+^:clj (ns test.core
+        (:use [clojure.pprint :only [pp]]))
+
+^:cljs (ns test.core
+         (:use-macros [clojure.pprint :only [pp]]))
 
 (defn ^:cljs p [x]
   (.log js/console x))

@@ -62,9 +62,6 @@ Returns a sequence of File objects, in breadth-first sort order."
   (generate cljx-path cljs-output-path "cljs")
 
 
-  (defn meta-guard [key]
-    #(-> % meta key (= true)))
-
   (defn ns->cljs-ns
     "Creates a cljs-compatible namespace form by splitting vars marked with ^:macro into appropriate use-macros or require-macros forms"
     [ns-form]
@@ -80,10 +77,16 @@ Returns a sequence of File objects, in breadth-first sort order."
 
     )
 
+  (require '[clojure.core.logic :as logic])
 
   (use '[kibit.rules.util :only [defrules]]
        '[clojure.core.logic :only [run* fresh matche == != membero]])
 
+  (kibit.core/simplify (quote ^:cljs (ns test.core
+                                       (:use-macros [clojure.pprint :only [pp]])))
+                       (mapcat logic/prep [cljs-rules]))
+  
+  
   (let [test1 '(reify
                  Prot1
                  (methodA [_ x] x)
