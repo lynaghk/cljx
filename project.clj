@@ -3,8 +3,9 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.3.0"]
-
-                 [org.clojure/core.logic "0.6.8"]
-                 [org.clojure/tools.namespace "0.1.2"]]
-
-  :source-paths  ["src/clj" "../software/kibit/src"])
+                 ;;[org.clojure/core.logic "0.6.8"]
+                 ]
+  
+  :source-paths  ["src/clj"
+                  "../software/kibit/src"
+                  "../software/core.logic/src/main/clojure"])
