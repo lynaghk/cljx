@@ -1,6 +1,6 @@
 (ns cljx.rules
   (:refer-clojure :exclude [==])
-  (:use [clojure.core.logic :only [matche conde pred lvar ==]]))
+  (:use [clojure.core.logic :only [matche conde pred lvar == firsto]]))
 
 (defn- meta-guard [key]
   #(-> % meta key (= true)))
@@ -21,7 +21,12 @@
        )
      #(== % x)]))
 
+(def remove-defmacro
+  [#(firsto % 'defmacro)
+   #(== % :cljx.core/exclude)])
+
 
 
 (def cljs-rules [cljs-protocols
-                 remove-marked-clj])
+                 remove-marked-clj
+                 remove-defmacro])
