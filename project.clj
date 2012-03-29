@@ -8,4 +8,12 @@
   
   :source-paths  ["src/clj"
                   "../software/kibit/src"
-                  "../software/core.logic/src/main/clojure"])
+                  "../software/core.logic/src/main/clojure"]
+
+  :cljsbuild {:builds
+              [{:source-path "test/generated/cljs",
+                :jar false,
+                :compiler
+                {:output-to "public/main.js",
+                 :optimizations :simple,
+                 :pretty-print true}}]})
