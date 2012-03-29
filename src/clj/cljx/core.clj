@@ -32,7 +32,7 @@ Returns a sequence of File objects, in breadth-first sort order."
 
 (defn generate
   ([cljx-path output-path extension]
-     (generate cljx-path output-path "cljs"
+     (generate cljx-path output-path extension
                cljs-rules))
 
   ([cljx-path output-path extension rules]
