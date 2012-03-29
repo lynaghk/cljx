@@ -5,12 +5,12 @@
 (defn- meta-guard [key]
   #(-> % meta key (= true)))
 
-(def remove-marked-clj
+(defn remove-marked [key]
   [#(matche [%]
             ([[_ var . _]]
-               (pred var (meta-guard :clj)))
+               (pred var (meta-guard key)))
             ([x]
-               (pred x (meta-guard :clj))))
+               (pred x (meta-guard key))))
    #(== % :cljx.core/exclude)])
 
 (def cljs-protocols
@@ -28,5 +28,7 @@
 
 
 (def cljs-rules [cljs-protocols
-                 remove-marked-clj
+                 (remove-marked :clj)
                  remove-defmacro])
+
+(def clj-rules [(remove-marked :cljs)])
