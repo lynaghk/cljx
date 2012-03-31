@@ -1,7 +1,6 @@
 (ns cljx.core
   (:use [cljx.rules :only [cljs-rules]]
-        [clojure.java.io :only [reader make-parents]]
-        :reload-all)
+        [clojure.java.io :only [reader make-parents]])
   (:require [clojure.string :as string]
             kibit.check)
   (:import [java.io File]))

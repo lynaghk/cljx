@@ -1,19 +1,15 @@
 (defproject cljx "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.3.0"]
-                 ;;[org.clojure/core.logic "0.6.8"]
-                 ]
-  
-  :source-paths  ["src/clj"
-                  "../software/kibit/src"
-                  "../software/core.logic/src/main/clojure"]
 
-  :cljsbuild {:builds
-              [{:source-path "test/generated/cljs",
-                :jar false,
-                :compiler
-                {:output-to "public/main.js",
-                 :optimizations :simple,
-                 :pretty-print true}}]})
+  :description "Static Clojure code rewriting"
+  :url "http://github.com/lynaghk/cljx"
+  :license {:name "BSD"
+            :url "http://www.opensource.org/licenses/BSD-3-Clause"}
+  
+  :dependencies [[org.clojure/tools.namespace "0.1.2"]
+                 [org.clojure/core.logic "0.7.0"]]
+  
+  ;;Until new core.logic and kibit releases are cut...
+  :source-paths  ["src"
+                  "../software/kibit/src"]
+  
+  :eval-in-leiningen true)

@@ -25,10 +25,16 @@
   [#(firsto % 'defmacro)
    #(== % :cljx.core/exclude)])
 
+(def remove-comment
+  [#(firsto % 'comment)
+   #(== % :cljx.core/exclude)])
+
 
 
 (def cljs-rules [cljs-protocols
                  (remove-marked :clj)
-                 remove-defmacro])
+                 remove-defmacro
+                 remove-comment])
 
-(def clj-rules [(remove-marked :cljs)])
+(def clj-rules [(remove-marked :cljs)
+                remove-comment])
