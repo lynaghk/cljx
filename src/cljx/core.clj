@@ -47,5 +47,5 @@ Returns a sequence of File objects, in breadth-first sort order."
 
          (make-parents generated-f)
          (spit generated-f
-               (str (warning-str (.getPath f)) 
+               (str (warning-str (.getPath f))
                     (string/join "\n" munged-forms)))))))

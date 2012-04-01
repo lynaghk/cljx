@@ -1,6 +1,5 @@
 (ns leiningen.cljx
-  (:use [cljx.core :only [generate]]
-        [cljx.rules :only [cljs-rules clj-rules]]))
+  (:use [cljx.core :only [generate]]))
 
 
 (def no-opts-warning "You need a :cljx entry in your project.clj! It should look something like:\n
@@ -14,14 +13,12 @@
   [project & args]
 
   (if-let [opts (:cljx project)]
-    (let [{:keys [cljx-paths clj-output-path cljs-output-path]} opts]
-
-      (when clj-output-path
-        (doseq [p cljx-paths]
-          (generate p clj-output-path "clj" clj-rules)))
-
-      (when cljs-output-path
-        (doseq [p cljx-paths]
-          (generate p cljs-output-path "cljs" cljs-rules))))
+    (if-let [{builds :builds} opts]
+      (doseq [{:keys [source-paths output-path extension rules]
+               :or {extension "clj"}} builds]
+        
+        (let [rules (eval rules)]
+          (doseq [p source-paths]
+            (generate p output-path extension rules)))))
 
     (println no-opts-warning)))

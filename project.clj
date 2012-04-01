@@ -6,10 +6,7 @@
             :url "http://www.opensource.org/licenses/BSD-3-Clause"}
   
   :dependencies [[org.clojure/tools.namespace "0.1.2"]
-                 [org.clojure/core.logic "0.7.0"]]
-  
-  ;;Until new core.logic and kibit releases are cut...
-  :source-paths  ["src"
-                  "../software/kibit/src"]
+                 [org.clojure/core.logic "0.7.0"]
+                 [jonase/kibit "0.0.3"]]
   
   :eval-in-leiningen true)
