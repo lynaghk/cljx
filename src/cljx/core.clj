@@ -38,6 +38,10 @@ Returns a sequence of File objects, in breadth-first sort order."
                cljs-rules))
 
   ([cljx-path output-path extension rules]
+     (println "Rewriting" cljx-path "to" output-path
+              (str "(" extension ")")
+              "with" (count rules) "rules.")
+     
      (doseq [f (find-cljx-sources-in-dir (File. cljx-path))]
 
        (let [munged-forms (munge-forms (reader f) rules)
