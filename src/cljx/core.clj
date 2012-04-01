@@ -25,7 +25,10 @@ Returns a sequence of File objects, in breadth-first sort order."
 
 (defn munge-forms
   [reader rules]
-  (->> (kibit.check/check-toplevel-forms reader rules)
+  (->> (kibit.check/check-reader reader
+                                 :rules rules
+                                 :guard identity
+                                 :resolution :toplevel)
        (map #(or (:alt %) (:expr %)))
        (remove #(= % :cljx.core/exclude))))
 

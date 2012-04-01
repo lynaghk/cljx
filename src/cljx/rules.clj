@@ -1,6 +1,7 @@
 (ns cljx.rules
   (:refer-clojure :exclude [==])
-  (:use [clojure.core.logic :only [matche conde pred lvar == firsto]]))
+  (:use [clojure.core.logic :only [matche conde pred lvar == firsto]]
+        [kibit.rules.util :only [compile-rule]]))
 
 (defn- meta-guard [key]
   #(-> % meta key (= true)))
@@ -22,12 +23,10 @@
      #(== % x)]))
 
 (def remove-defmacro
-  [#(firsto % 'defmacro)
-   #(== % :cljx.core/exclude)])
+  (compile-rule '[(defmacro . ?_) :cljx.core/exclude]))
 
 (def remove-comment
-  [#(firsto % 'comment)
-   #(== % :cljx.core/exclude)])
+  (compile-rule '[(comment . ?_) :cljx.core/exclude]))
 
 
 
