@@ -27,6 +27,38 @@ To use it, add it to your `project.clj`:
                  :rules cljx.rules/cljs-rules}]}
 ```
 
+The included clj and cljs rule sets will remove forms marked with platform-specific metadata and rename protocols as appropriate.
+E.g., the `.cljx` source containing
+
+```clojure
+^:clj (ns c2.maths
+        (:use [c2.macros :only [combine-with]]))
+^:cljs (ns c2.maths
+         (:use-macros [c2.macros :only [combine-with]]))
+
+(defn ^:clj sin [x] (Math/sin x))
+(defn ^:cljs sin [x] (.sin js/Math x))
+
+(reify
+  clojure.lang.IFn
+  (invoke [_ x] (inc x)))
+```
+
+
+will yield ClojureScript source:
+
+```clojure
+(ns c2.maths
+  (:use-macros [c2.macros :only [combine-with]]))
+
+(defn sin [x] (.sin js/Math x))
+
+(reify
+  IFn
+  (invoke [_ x] (inc x)))
+```
+
+
 The value associated with `:rules` is `eval`'d in the plugin namespace.
 You can specify your own rules inline, or load from a file:
 
@@ -41,8 +73,7 @@ See [Kibit](http://github.com/jonase/kibit) for more info on writing rules, and 
 Clojure is a hosted language
 ----------------------------
 Cljx does *not* try to hide implementation differences between host platforms.
-Clojure has ints, floats, longs, &c., ClojureScript has number.
-Clojure regular expressions might act differently than ClojureScript regular expressions, because *they are different*.
+Clojure has ints, floats, longs, &c., ClojureScript has number; Clojure regular expressions act differently than ClojureScript regular expressions, because *they are different*.
 
 Cljx only tries to unify Clojure/ClojureScript abstractions when it makes sense.
 E.g., converting `clojure.lang.IFn` into `IFn` when generating ClojureScript.
@@ -54,3 +85,8 @@ Emacs users, want syntax highlighting?
 Add to your emacs config: `(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`.
 
 
+
+Todo
+----
+
++ Hook into cljsbuild + jar processes
