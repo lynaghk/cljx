@@ -97,3 +97,9 @@ Misc
 ----
 Emacs users, want syntax highlighting?
 Add to your emacs config: `(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`.
+
+
+Thanks
+======
+@jonase & @ohpauleez for kibit
+@swannodette for core.logic
