@@ -27,6 +27,14 @@ To use it, add it to your `project.clj`:
                  :rules cljx.rules/cljs-rules}]}
 ```
 
+Add
+
+```clojure
+:hooks [cljx.hooks]
+```
+
+to automatically run cljx before cutting a JAR.
+
 The included clj and cljs rule sets will remove forms marked with platform-specific metadata and rename protocols as appropriate.
 E.g., the `.cljx` source containing
 
@@ -89,10 +97,3 @@ Misc
 ----
 Emacs users, want syntax highlighting?
 Add to your emacs config: `(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`.
-
-
-
-Todo
-----
-
-+ Hook into cljsbuild + jar processes

@@ -10,7 +10,7 @@
 
 (defn cljx
   "Statically transform .cljx files into Clojure and ClojureScript sources."
-  [project & args]
+  [project]
 
   (if-let [opts (:cljx project)]
     (if-let [{builds :builds} opts]
