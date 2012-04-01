@@ -44,8 +44,7 @@ E.g., the `.cljx` source containing
   (invoke [_ x] (inc x)))
 ```
 
-
-will yield ClojureScript source:
+will, when run through `cljx.rules/cljs-rules`, yield:
 
 ```clojure
 (ns c2.maths
@@ -58,12 +57,19 @@ will yield ClojureScript source:
   (invoke [_ x] (inc x)))
 ```
 
-
 The value associated with `:rules` is `eval`'d in the plugin namespace.
 You can specify your own rules inline, or load from a file:
 
 ```clojure   
 :rules (load-file "my-rules.clj")
+```
+
+with the file containing, for instance:
+
+```clojure
+(use '[kibit.rules.util :only [compile-rule]])
+
+[(compile-rule '[(+ ?x 1) (inc ?x)])]
 ```
 
 Forms that are converted into `:cljx.core/exclude` will be excluded from the output.
