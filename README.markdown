@@ -98,8 +98,14 @@ Misc
 Emacs users, want syntax highlighting?
 Add to your emacs config: `(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`.
 
+Todo
+----
+
++ CLJS: Remove docstrings from namespaces.
 
 Thanks
 ======
 @jonase & @ohpauleez for kibit
 @swannodette for core.logic
+
+
