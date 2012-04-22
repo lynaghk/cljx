@@ -22,6 +22,13 @@
        )
      #(== % x)]))
 
+(def js-error
+  (let [x (lvar)]
+    [#(conde
+       ((== % 'Error)  (== x 'js/Error))
+       ((== % 'Error.)  (== x 'js/Error.)))
+     #(== % x)]))
+
 (def remove-defmacro
   (compile-rule '[(defmacro . ?_) :cljx.core/exclude]))
 
@@ -31,6 +38,7 @@
 
 
 (def cljs-rules [cljs-protocols
+                 js-error
                  (remove-marked :clj)
                  remove-defmacro
                  remove-comment])
