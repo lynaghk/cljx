@@ -22,9 +22,12 @@
        )
      #(== % x)]))
 
-(def js-error
+(def cljs-types
   (let [x (lvar)]
-    [#(conde
+    [#(conde 
+       ((== % 'clojure.lang.Atom)  (== x 'cljs.core.Atom))
+       
+       ;;Is there a nicer way to handle the trailing dot?
        ((== % 'Error)  (== x 'js/Error))
        ((== % 'Error.)  (== x 'js/Error.)))
      #(== % x)]))
@@ -38,7 +41,7 @@
 
 
 (def cljs-rules [cljs-protocols
-                 js-error
+                 cljs-types
                  (remove-marked :clj)
                  remove-defmacro
                  remove-comment])
