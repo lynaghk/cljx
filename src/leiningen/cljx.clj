@@ -14,11 +14,12 @@
 
   (if-let [opts (:cljx project)]
     (if-let [{builds :builds} opts]
-      (doseq [{:keys [source-paths output-path extension rules]
-               :or {extension "clj"}} builds]
-        
+      (doseq [{:keys [source-paths output-path extension rules include-meta]
+               :or {extension "clj" include-meta false}} builds]
+
         (let [rules (eval rules)]
           (doseq [p source-paths]
-            (generate p output-path extension rules)))))
+            (binding [*print-meta* include-meta]
+              (generate p output-path extension rules))))))
 
     (println no-opts-warning)))
