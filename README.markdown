@@ -24,6 +24,7 @@ To use it, add it to your `project.clj`:
                 {:source-paths ["src/cljx"]
                  :output-path ".generated/cljs"
                  :extension "cljs"
+                 :include-meta true
                  :rules cljx.rules/cljs-rules}]}
 ```
 
