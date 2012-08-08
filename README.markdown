@@ -28,6 +28,8 @@ To use it, add it to your `project.clj`:
                  :rules cljx.rules/cljs-rules}]}
 ```
 
+Can be run "once" or "auto", in which case it will watch all source-paths for changes to .cljx files.  Defaults to "once".
+
 Add
 
 ```clojure
