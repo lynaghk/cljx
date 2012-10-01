@@ -1,7 +1,6 @@
 (ns leiningen.cljx
-  (:use [cljx.core :only [generate]]
-        [watchtower.core :only [watcher* watch rate file-filter on-change extensions]]))
-
+  (:require [leiningen.core.eval :refer (eval-in-project)]
+            [leiningen.core.project :as project]))
 
 (def no-opts-warning "You need a :cljx entry in your project.clj! It should look something like:\n
   :cljx {:cljx-paths [\"src/cljx\"]
@@ -9,30 +8,42 @@
          :cljs-output-path \".generated/cljs\"}
 ")
 
-(defn- cljx-compile [builds]
-  "The actual static transform, separated out so it can be called repeatedly."
-  (doseq [{:keys [source-paths output-path extension rules include-meta]
-           :or {extension "clj" include-meta false}} builds]
-    (let [rules (eval rules)]
-      (doseq [p source-paths]
-        (binding [*print-meta* include-meta]
-          (generate p output-path extension rules))))))
+(defn- cljx-eip
+  "Evaluates the given [form] within the context of a [project].  A single
+form that is to be run beforehand (for requires, etc) is specified by
+[init].
+
+This variant of eval-in-project implicitly adds the current :plugin dep on
+cljx to the main :dependencies vector of the project, as well as specifying
+that the eval should happen in-process in a new classloader (faster!)."
+  [project init form]
+  (let [cljx-plugin (filter (comp #(= % 'com.keminglabs/cljx) first)
+                            (:plugins project))]
+    (eval-in-project
+      (-> project
+        (project/merge-profiles [{:dependencies cljx-plugin}])
+        (assoc :eval-in :classloader))
+      form
+      init)))
 
 (defn- once
   "Transform .cljx files once and then exit."
-  [builds]
-  (cljx-compile builds))
+  [project builds]
+  (cljx-eip project '(require 'cljx.core) `(#'cljx.core/cljx-compile '~builds)))
 
 (defn- auto
   "Watch .cljx files and transform them after any changes."
-  [builds]
-  (let [dirs (set (flatten (map :source-paths builds)))]
-    (println "Watching" (vec dirs) "for changes.")
-    (-> (watcher* dirs)
-        (file-filter (extensions :cljx))
-        (rate 1000)
-        (on-change (fn [_] (cljx-compile builds)))
-        (watch))))
+  [project builds]
+  (cljx-eip project
+       '(require 'cljx.core '[watchtower.core :as wt])
+       (let [dirs (set (flatten (map :source-paths builds)))]
+          `(do
+             (println "Watching" (vec ~dirs) "for changes.")
+             (-> (wt/watcher* ~dirs)
+               (wt/file-filter (wt/extensions :cljx))
+               (wt/rate 1000)
+               (wt/on-change (fn [_#] (#'cljx.core/cljx-compile '~builds)))
+               (wt/watch))))))
 
 (defn cljx
   "Statically transform .cljx files into Clojure and ClojureScript sources."
@@ -43,7 +54,7 @@
       (if-let [opts (:cljx project)]
         (if-let [{builds :builds} opts]
           (case subtask
-            "once" (once builds)
-            "auto" (auto builds)))
+            "once" (once project builds)
+            "auto" (auto project builds)))
 
         (println no-opts-warning))))

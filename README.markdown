@@ -68,23 +68,32 @@ will, when run through `cljx.rules/cljs-rules`, yield:
   (invoke [_ x] (inc x)))
 ```
 
-The value associated with `:rules` is `eval`'d in the plugin namespace.
-You can specify your own rules inline, or load from a file:
-
-```clojure   
-:rules (load-file "my-rules.clj")
-```
-
-with the file containing, for instance:
+The value associated with `:rules` should be a symbol naming a var containing
+the rules to use for that build.  `cljx.rules/cljs-rules` and `cljx.rules/clj-rules`
+are provided as a convenience, but you can extend those (or replace them entirely).
+For example, a namespace on your classpath like this defines some rules:
 
 ```clojure
-(use '[kibit.rules.util :only [compile-rule]])
+(ns my.rules
+  (:require [kibit.rules.util :refer (compile-rule defrules)]))
 
-[(compile-rule '[(+ ?x 1) (inc ?x)])]
+(defrules rules
+  [(+ ?x 1) (inc ?x)]
+  [(- ?x 1) (dec ?x)])
 ```
 
+Now you can use those rules in a cljx build like so:
+
+```clojure   
+:rules my.rules/rules
+```
+
+The var's namespace will be automatically loaded by cljx (i.e. no need to do so
+manually via the `:injections` key in your `project.clj`).
+
 Forms that are converted into `:cljx.core/exclude` will be excluded from the output.
-See [Kibit](http://github.com/jonase/kibit) for more info on writing rules, and [C2](https://github.com/lynaghk/c2) for a project that uses `.cljx` heavily.
+See [Kibit](http://github.com/jonase/kibit) for more info on writing rules, and
+[C2](https://github.com/lynaghk/c2) for a project that uses `.cljx` heavily.
 
 
 Clojure is a hosted language

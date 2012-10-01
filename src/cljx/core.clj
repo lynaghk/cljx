@@ -53,3 +53,19 @@ Returns a sequence of File objects, in breadth-first sort order."
          (spit generated-f
                (str (warning-str (.getPath f))
                     (string/join "\n" munged-forms)))))))
+
+(defn- cljx-compile [builds]
+  "The actual static transform, separated out so it can be called repeatedly."
+  (doseq [{:keys [source-paths output-path extension rules include-meta]
+           :or {extension "clj" include-meta false}} builds]
+    (let [rules (if-not (symbol? rules)
+                  ;; TODO now that we are evaluating within the context of the
+                  ;; user's project, there should be no reason for this eval to
+                  ;; exist any more
+                  (eval rules)
+                  (do
+                    (require (symbol (namespace rules)))
+                    @(resolve rules)))]
+      (doseq [p source-paths]
+        (binding [*print-meta* include-meta]
+          (generate p output-path extension rules))))))
