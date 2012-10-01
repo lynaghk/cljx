@@ -16,7 +16,7 @@ Cljx is a Lein plugin that emits Clojure and ClojureScript code from a single me
 To use it, add it to your `project.clj`:
 
 ```clojure
-:plugins [com.keminglabs/cljx "0.1.4"]
+:plugins [[com.keminglabs/cljx "0.1.4"]]
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path ".generated/clj"
                  :rules cljx.rules/clj-rules}
