@@ -22,7 +22,10 @@ that the eval should happen in-process in a new classloader (faster!)."
     (eval-in-project
       (-> project
         (project/merge-profiles [{:dependencies cljx-plugin}])
-        (assoc :eval-in :classloader))
+        (assoc :eval-in :classloader
+               ; don't AOT any Clojure, as cljx will likely generate some .clj files
+               ; that will be needed to make sure that succeeds
+               :prep-tasks ["javac"]))
       form
       init)))
 
