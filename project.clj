@@ -1,4 +1,4 @@
-(defproject com.keminglabs/cljx "0.2.0"
+(defproject com.keminglabs/cljx "0.2.1"
 
   :description "Static Clojure code rewriting"
   :url "http://github.com/lynaghk/cljx"
@@ -9,4 +9,5 @@
                  [jonase/kibit "0.0.3"]
                  [watchtower "0.1.1"]]
 
+  :min-lein-version "2.0.0"
   :eval-in-leiningen true)
