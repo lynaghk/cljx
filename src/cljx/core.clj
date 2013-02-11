@@ -23,6 +23,20 @@ Returns a sequence of File objects, in breadth-first sort order."
   (sort-by #(.getAbsolutePath ^File %)
            (filter cljx-source-file? (file-seq dir))))
 
+;; not using clojure.walk/walk because of http://groups.google.com/group/clojure-dev/browse_frm/thread/f8e2f2b0276783a9
+(defn- walk
+  [inner outer form]
+  (cond
+   (list? form) (outer (with-meta (apply list (map inner form)) (meta form)))
+   (instance? clojure.lang.IMapEntry form) (outer (vec (map inner form)))
+   (seq? form) (outer (doall (map inner form)))
+   (coll? form) (outer (into (empty form) (map inner form)))
+   :else (outer form)))
+
+(defn- postwalk
+  [f form]
+  (walk (partial postwalk f) f form))
+
 (defn munge-forms
   [reader rules]
   (->> (kibit.check/check-reader reader
@@ -30,7 +44,15 @@ Returns a sequence of File objects, in breadth-first sort order."
                                  :guard identity
                                  :resolution :toplevel)
        (map #(or (:alt %) (:expr %)))
-       (remove #(= % :cljx.core/exclude))))
+       (postwalk
+         #(cond
+            (instance? clojure.lang.IMapEntry %) %
+            (seq? %) (with-meta
+                       (apply list (remove (partial = :cljx.core/exclude) %))
+                       (meta %))
+            (coll? %) (into (empty %) (remove (partial = :cljx.core/exclude) %))
+            :else %))))
+
 
 (defn generate
   ([cljx-path output-path extension]
