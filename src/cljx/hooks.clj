@@ -1,12 +1,11 @@
 (ns cljx.hooks
   (:require leiningen.cljx
             [robert.hooke :as hooke]
-            [leiningen.jar :as ljar]))
+            [leiningen.compile :as lcompile]))
 
-(defn- jar-hook [task & args]
-  (apply task args)
-  (let [project (first args)]
-    (leiningen.cljx/cljx project)))
+(defn- hook [task & args]
+  (leiningen.cljx/cljx (first args))
+  (apply task args))
 
 (defn activate []
-  (hooke/add-hook #'ljar/write-jar #'jar-hook))
+  (hooke/add-hook #'lcompile/compile #'hook))
