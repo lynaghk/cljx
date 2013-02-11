@@ -1,4 +1,4 @@
-(defproject com.keminglabs/cljx "0.2.1"
+(defproject com.keminglabs/cljx "0.2.2-SNAPSHOT"
 
   :description "Static Clojure code rewriting"
   :url "http://github.com/lynaghk/cljx"
