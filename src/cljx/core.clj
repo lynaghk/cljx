@@ -56,13 +56,19 @@ Returns a sequence of File objects, in breadth-first sort order."
   [line-number form]
   (let [offset (if (and (list? form) (-> form meta :line))
                  (-> form meta :line (- line-number) (max 0))
-                 0)]
+                 0)
+        write-form (fn [offset form delim delim2]
+                     (#'clojure.core/print-meta form *out*)
+                     (print delim)
+                     (let [ret (reduce write-on-correct-lines (+ offset line-number) form)]
+                       (print delim2)
+                       ret))]
     (dotimes [_ offset] (println))
     (cond
-      (list? form) (let [_ (do (#'clojure.core/print-meta form *out*) (print "(")) 
-                         ret (reduce write-on-correct-lines (+ offset line-number) form)]
-                     (print ")")
-                     ret)
+      (list? form) (write-form offset form "(" ")")
+      (set? form) (write-form offset form "#{" "}")
+      (vector? form) (write-form offset form "[" "]")
+      (map? form) (write-form offset (apply concat form) "{" "}")
       :else (do (pr form) (print " ") (+ line-number offset)))))
 
 (defn generate
