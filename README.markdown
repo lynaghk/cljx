@@ -36,7 +36,7 @@ Add
 :hooks [cljx.hooks]
 ```
 
-to automatically run cljx before cutting a JAR.
+to automatically run cljx before starting a REPL, cutting a JAR, etc.
 
 The included clj and cljs rule sets will remove forms marked with platform-specific metadata and rename protocols as appropriate.
 E.g., the `.cljx` source containing
