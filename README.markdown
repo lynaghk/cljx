@@ -122,6 +122,9 @@ Clojure has ints, floats, longs, &c., ClojureScript has number; Clojure regular 
 Cljx only tries to unify Clojure/ClojureScript abstractions when it makes sense.
 E.g., converting `clojure.lang.IFn` into `IFn` when generating ClojureScript.
 
+Also, note that *cljx has no effect on code produced by macros*.
+Macroexpansion occurs long after cljx touches your code.
+
 
 Misc
 ----
@@ -132,6 +135,7 @@ Todo
 ----
 
 + CLJS: Remove docstrings from namespaces.
++ Explore providing an API that macros can easily use to transform their results
 
 Thanks
 ======
