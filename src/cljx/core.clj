@@ -37,20 +37,23 @@ Returns a sequence of File objects, in breadth-first sort order."
   (walk (partial postwalk f) f form))
 
 (defn munge-forms
-  [reader rules]
-  (->> (kibit.check/check-reader reader
-                                 :rules rules
-                                 :guard identity
-                                 :resolution :toplevel)
-       (map #(or (:alt %) (:expr %)))
-       (postwalk
+  [reader {:keys [rules nested-exclusions]}]
+  (let [munged (map #(or (:alt %) (:expr %))
+                    (kibit.check/check-reader reader
+                                              :rules rules
+                                              :guard identity
+                                              :resolution :toplevel))]
+    (if-not nested-exclusions
+      (remove #(= % :cljx.core/exclude) munged)
+      (postwalk
          #(cond
             (instance? clojure.lang.IMapEntry %) %
             (seq? %) (with-meta
                        (apply list (remove (partial = :cljx.core/exclude) %))
                        (meta %))
             (coll? %) (into (empty %) (remove (partial = :cljx.core/exclude) %))
-            :else %))))
+            :else %)
+         munged))))
 
 (defn- write-on-correct-lines
   [line-number form]
@@ -72,33 +75,34 @@ Returns a sequence of File objects, in breadth-first sort order."
       :else (do (pr form) (print " ") (+ line-number offset)))))
 
 (defn generate
-  ([cljx-path output-path extension]
-     (generate cljx-path output-path extension
-               cljs-rules))
-
-  ([cljx-path output-path extension rules]
-     (println "Rewriting" cljx-path "to" output-path
-              (str "(" extension ")")
-              "with" (count rules) "rules.")
+  [cljx-path {:keys [output-path extension rules
+                     nested-exclusions maintain-form-position] :as options}]
+  (println "Rewriting" cljx-path "to" output-path
+           (str "(" extension ")")
+           "with" (count rules) "rules.")
      
-     (doseq [f (find-cljx-sources-in-dir (File. cljx-path))]
-
-       (let [munged-forms (munge-forms (reader f) rules)
-             generated-f  (File. (-> (.getPath f)
-                                     (string/replace cljx-path output-path)
-                                     (string/replace #"cljx$" extension)))]
-
-         (make-parents generated-f)
-         (spit generated-f
-           (with-out-str
-             (print warning-str)
-             (println (.getPath f))
-             (reduce write-on-correct-lines 2 munged-forms)))))))
+  (doseq [f (find-cljx-sources-in-dir (File. cljx-path))]
+    (let [munged-forms (munge-forms (reader f) options)
+          generated-f  (File. (-> (.getPath f)
+                                (string/replace cljx-path output-path)
+                                (string/replace #"cljx$" extension)))]
+      (make-parents generated-f)
+      (spit generated-f
+        (with-out-str
+          (print warning-str)
+          (println (.getPath f))
+          (if maintain-form-position
+            (reduce write-on-correct-lines 2 munged-forms)
+            (doseq [form munged-forms] (prn form))))))))
 
 (defn- cljx-compile [builds]
   "The actual static transform, separated out so it can be called repeatedly."
-  (doseq [{:keys [source-paths output-path extension rules include-meta]
-           :or {extension "clj" include-meta false}} builds]
+  (doseq [build builds
+          :let [{:keys [source-paths output-path extension rules
+                        include-meta nested-exclusions maintain-form-position] :as opts}
+                (merge {:extension "clj" :include-meta false
+                        :maintain-form-position false :nested-exclusions false}
+                  build)]]
     (let [rules (if-not (symbol? rules)
                   ;; TODO now that we are evaluating within the context of the
                   ;; user's project, there should be no reason for this eval to
@@ -109,4 +113,4 @@ Returns a sequence of File objects, in breadth-first sort order."
                     @(resolve rules)))]
       (doseq [p source-paths]
         (binding [*print-meta* include-meta]
-          (generate p output-path extension rules))))))
+          (generate p (assoc opts :rules rules)))))))

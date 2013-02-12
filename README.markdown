@@ -38,6 +38,24 @@ Add
 
 to automatically run cljx before starting a REPL, cutting a JAR, etc.
 
+Available options include:
+
+<!--
+* `:nested-exclusions` — When true, `^:clj` and `^:cljs` metadata (used to
+  indicate target-specific inclusions/exclusions) may be used on "nested"
+(non-top-level) forms (defaults `false`)
+* `:maintain-form-position` – When true, the line positions of transformed cljx
+  forms are maintained, which aligns error and debug info (e.g. line numbers in
+stack traces, ClojureScript source maps, etc) in the generated files with those
+in the source cljx files (defaults `false`)
+-->
+* `:include-meta` — pass code-level metadata along to generated Clojure and
+  ClojureScript (defaults `false`)
+* `:extension` — a string indicating the target of a given "build" (defaults
+  `"clj"`)
+* `:rules` — a fully-qualified symbol that names a var containing the rules to
+  be used
+
 The included clj and cljs rule sets will remove forms marked with platform-specific metadata and rename protocols as appropriate.
 E.g., the `.cljx` source containing
 
