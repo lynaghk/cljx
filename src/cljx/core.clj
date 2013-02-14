@@ -36,24 +36,37 @@ Returns a sequence of File objects, in breadth-first sort order."
   [f form]
   (walk (partial postwalk f) f form))
 
+(defn- remove-exclusions
+  [{:keys [nested-exclusions]} munged-exprs]
+  (if-not nested-exclusions
+    (remove #(= % :cljx.core/exclude) munged-exprs)
+    (postwalk
+      #(cond
+         (instance? clojure.lang.IMapEntry %) %
+         (seq? %) (with-meta
+                    (apply list (remove (partial = :cljx.core/exclude) %))
+                    (meta %))
+         (coll? %) (into (empty %) (remove (partial = :cljx.core/exclude) %))
+         :else %)
+      munged-exprs)))
+
+(defn munge-expr
+  [expr {:keys [rules nested-exclusions] :as options}]
+  (->> (kibit.check/check-expr expr
+                               :rules rules
+                               :guard identity
+                               :resolution :toplevel)
+    (map #(or (:alt %) (:expr %)))
+    (remove-exclusions options)))
+
 (defn munge-forms
-  [reader {:keys [rules nested-exclusions]}]
-  (let [munged (map #(or (:alt %) (:expr %))
-                    (kibit.check/check-reader reader
-                                              :rules rules
-                                              :guard identity
-                                              :resolution :toplevel))]
-    (if-not nested-exclusions
-      (remove #(= % :cljx.core/exclude) munged)
-      (postwalk
-         #(cond
-            (instance? clojure.lang.IMapEntry %) %
-            (seq? %) (with-meta
-                       (apply list (remove (partial = :cljx.core/exclude) %))
-                       (meta %))
-            (coll? %) (into (empty %) (remove (partial = :cljx.core/exclude) %))
-            :else %)
-         munged))))
+  [reader {:keys [rules nested-exclusions] :as options}]
+  (->> (kibit.check/check-reader reader
+                                 :rules rules
+                                 :guard identity
+                                 :resolution :toplevel)
+    (map #(or (:alt %) (:expr %)))
+    (remove-exclusions options)))
 
 (defn- write-on-correct-lines
   [line-number form]
