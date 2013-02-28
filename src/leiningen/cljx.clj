@@ -22,17 +22,24 @@ that the eval should happen in-process in a new classloader (faster!)."
     (eval-in-project
       (-> project
         (project/merge-profiles [{:dependencies cljx-plugin}])
-        (assoc :eval-in :classloader
-               ; don't AOT any Clojure, as cljx will likely generate some .clj files
-               ; that will be needed to make sure that succeeds
-               :prep-tasks ["javac"]))
+        ; don't AOT any Clojure, as cljx will likely generate some .clj files
+        ; that will be needed to make sure that succeeds
+        (assoc :prep-tasks ["javac"]))
       form
       init)))
 
 (defn- once
   "Transform .cljx files once and then exit."
   [project builds]
-  (cljx-eip project '(require 'cljx.core) `(#'cljx.core/cljx-compile '~builds)))
+  (cljx-eip project
+    '(require 'cljx.core)
+    `(do
+       ; ensure namespaces containing vars named in data_readers.clj files are loaded
+       ; once Leiningen uses Clojure 1.5.0, we can :eval-in :classloader
+       ; and bind *default-data-reader-fn* to a dummy type that prints just like
+       ; the tagged literals that we read
+       (doseq [v# (vals *data-readers*)] (require (-> v# .ns str symbol)))
+       (#'cljx.core/cljx-compile '~builds))))
 
 (defn- auto
   "Watch .cljx files and transform them after any changes."
