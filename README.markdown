@@ -17,7 +17,7 @@ metadata-annotated codebase.
 To use it, add it to your `project.clj`:
 
 ```clojure
-:plugins [[com.keminglabs/cljx "0.2.0"]]
+:plugins [[com.keminglabs/cljx "0.2.2"]]
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path ".generated/clj"
                  :rules cljx.rules/clj-rules}
