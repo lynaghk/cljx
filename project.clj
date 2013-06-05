@@ -5,8 +5,7 @@
   :license {:name "BSD"
             :url "http://www.opensource.org/licenses/BSD-3-Clause"}
 
-  :dependencies [[org.clojure/core.logic "0.7.0"]
-                 [jonase/kibit "0.0.3"]
+  :dependencies [[jonase/kibit "0.0.8"]
                  [watchtower "0.1.1"]]
 
   :min-lein-version "2.0.0"

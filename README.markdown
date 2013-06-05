@@ -11,7 +11,8 @@
                  \______/           
 
 
-Cljx is a Lein plugin that emits Clojure and ClojureScript code from a single metadata-annotated codebase.
+Cljx is a Lein plugin that emits Clojure and ClojureScript code from a single
+metadata-annotated codebase.
 
 To use it, add it to your `project.clj`:
 
@@ -28,7 +29,8 @@ To use it, add it to your `project.clj`:
                  :rules cljx.rules/cljs-rules}]}
 ```
 
-Can be run "once" or "auto", in which case it will watch all source-paths for changes to .cljx files.  Defaults to "once".
+Can be run "once" or "auto", in which case it will watch all source-paths for
+changes to .cljx files.  Defaults to "once".
 
 Add
 
@@ -40,15 +42,13 @@ to automatically run cljx before starting a REPL, cutting a JAR, etc.
 
 Available options include:
 
-<!--
 * `:nested-exclusions` — When true, `^:clj` and `^:cljs` metadata (used to
   indicate target-specific inclusions/exclusions) may be used on "nested"
-(non-top-level) forms (defaults `false`)
+  (non-top-level) forms (defaults `false`)
 * `:maintain-form-position` – When true, the line positions of transformed cljx
   forms are maintained, which aligns error and debug info (e.g. line numbers in
-stack traces, ClojureScript source maps, etc) in the generated files with those
-in the source cljx files (defaults `false`)
--->
+  stack traces, ClojureScript source maps, etc) in the generated files with
+  those in the source cljx files (defaults `false`)
 * `:include-meta` — pass code-level metadata along to generated Clojure and
   ClojureScript (defaults `false`)
 * `:extension` — a string indicating the target of a given "build" (defaults
@@ -56,7 +56,9 @@ in the source cljx files (defaults `false`)
 * `:rules` — a fully-qualified symbol that names a var containing the rules to
   be used
 
-The included clj and cljs rule sets will remove forms marked with platform-specific metadata and rename protocols as appropriate.
+The included clj and cljs rule sets will remove forms marked with
+platform-specific metadata and rename protocols as appropriate.
+
 E.g., the `.cljx` source containing
 
 ```clojure
@@ -117,7 +119,9 @@ See [Kibit](http://github.com/jonase/kibit) for more info on writing rules, and
 Clojure is a hosted language
 ----------------------------
 Cljx does *not* try to hide implementation differences between host platforms.
-Clojure has ints, floats, longs, &c., ClojureScript has number; Clojure regular expressions act differently than ClojureScript regular expressions, because *they are different*.
+Clojure has ints, floats, longs, &c., ClojureScript has number; Clojure regular
+expressions act differently than ClojureScript regular expressions, because
+*they are different*.
 
 Cljx only tries to unify Clojure/ClojureScript abstractions when it makes sense.
 E.g., converting `clojure.lang.IFn` into `IFn` when generating ClojureScript.
