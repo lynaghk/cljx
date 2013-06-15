@@ -11,7 +11,14 @@
                   ; results in a stackoverflow....
                   ; https://github.com/lynaghk/cljx/issues/9
                   :exclusions [org.clojure/core.logic]]
-                 [watchtower "0.1.1"]]
+                 [watchtower "0.1.1"]
+                 [com.cemerick/piggieback "0.0.4"]]
+
+  :profiles {:dev {:dependencies [[org.clojure/clojure "1.5.1"]
+                                  [org.clojure/clojurescript "0.0-1820"]]
+                   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
+                                                     cljx.repl-middleware/wrap-cljx]}}}
 
   :min-lein-version "2.0.0"
   :eval-in-leiningen true)
+

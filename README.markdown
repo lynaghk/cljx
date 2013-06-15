@@ -130,6 +130,35 @@ Also, note that *cljx has no effect on code produced by macros*.
 Macroexpansion occurs long after cljx touches your code.
 
 
+REPL Integration
+----------------
+Cljx provides an nREPL middleware that allows you to work with `.cljx` files in
+the same way you work with regular `.clj` files from any toolchain with good
+nREPL support, like [nrepl.el](https://github.com/kingtim/nrepl.el),
+[Counterclockwise](http://code.google.com/p/counterclockwise/), etc.
+
+In your project, _in addition_ to adding cljx as a plugin, just add its
+middleware in your `:dev` profile (along with
+[Piggieback](https://github.com/cemerick/piggieback)'s, assuming you're going to
+be interacting with ClojureScript REPLs as well):
+
+```clojure
+:profiles {:dev {:dependencies [[com.keminglabs/cljx "0.2.2"]]
+                 :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
+                                                   cljx.repl-middleware/wrap-cljx]}}}
+```
+
+Now all REPL evaluations and `load-file` operations will be processed by cljx
+appropriately before they reach the Clojure or ClojureScript compiler.  Whether
+cljx code is processed for Clojure or ClojureScript is determined by the
+existence [or not] of a Piggieback ClojureScript environment in your current
+nREPL session's environment; this is entirely automatic.
+
+Currently, only cljx's default rulesets are used in this case (though you can
+work around this by making your own higher-order cljx nREPL middleware that uses
+whatever rulesets you want).
+
+
 Misc
 ----
 Emacs users, want syntax highlighting?
