@@ -20,9 +20,6 @@
             :else zip-loc#)))
 
 (def cljs-rules [(elide-marked :clj)])
-; TODO elide (comment ...)
-; TODO elide (defmacro ...)
-; TODO generalized symbol substitution
 
 (def clj-rules [(elide-marked :cljs)])
 
