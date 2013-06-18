@@ -1,4 +1,4 @@
-^:clj (ns cljx.a
+      (ns cljx.a
         (:use [clojure.pprint :only [pp]]))
 
                  
@@ -8,7 +8,7 @@
            
                       
 
-^:clj
+     
 (defn p [x]
   (println x))
 

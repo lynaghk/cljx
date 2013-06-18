@@ -2,24 +2,43 @@
   (:require [net.cgrand.sjacket :as sj]
             [clojure.core.match :refer (match)]
             [clojure.zip :as z]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import net.cgrand.parsley.Node))
 
-(defn- replacement-whitespace-for
+(defn- whitespace-for
+  [string]
+  (str/replace string #"[^\n\r]" " "))
+
+(defn- whitespace-node-for
   [node]
-  (let [code (sj/str-pt node)
-        ws (str/replace code #"[^\n\r]" " ")]
-    (net.cgrand.parsley.Node. :whitespace [ws])))
+  (Node. :whitespace [(whitespace-for (sj/str-pt node))]))
 
 (defmacro elide-marked
   [kw]
   `(fn [zip-loc#]
      (match [(z/node zip-loc#)]
             [{:tag :meta :content [~'_ {:tag :keyword :content [~'_ {:content [~(name kw)]}]} & ~'_]}]
-            (z/edit zip-loc# replacement-whitespace-for)
+            (z/edit zip-loc# whitespace-node-for)
 
             :else zip-loc#)))
 
-(def cljs-rules [(elide-marked :clj)])
+; this is necessary because these marks are really not intended for runtime, and
+; can cause read/load errors when e.g. on strings
+(defmacro elide-mark
+  [kw]
+  `(fn [zip-loc#]
+     (match [(z/node zip-loc#)]
+            [{:tag :meta :content [~'_ {:tag :keyword :content [~'_ {:content [~(name kw)]}]} & contents#]}]
+            (z/edit zip-loc#
+                    assoc :content
+                    (vec (cons (Node. :whitespace [(whitespace-for (str "^" ~kw))])
+                               contents#)))
 
-(def clj-rules [(elide-marked :cljs)])
+            :else zip-loc#)))
+
+(def cljs-rules [(elide-marked :clj)
+                 (elide-mark :cljs)])
+
+(def clj-rules [(elide-marked :cljs)
+                (elide-mark :clj)])
 

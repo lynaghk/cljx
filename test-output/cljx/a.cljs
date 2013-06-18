@@ -1,10 +1,10 @@
                 
                                            
 
-^:cljs (ns cljx.a
+       (ns cljx.a
          (:use-macros [clojure.pprint :only [pp]]))
 
-^:cljs
+      
 (defn p [x]
   (.log js/console x))
 
