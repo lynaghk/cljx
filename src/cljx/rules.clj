@@ -31,8 +31,21 @@
                                 annotated-exprs)))))
          :else zip-loc))
 
+(defn elide-form
+  [form-name zip-loc]
+  (match [(z/node zip-loc)]
+         [{:tag :list
+           :content ["(" {:tag :symbol
+                          :content [{:tag :name :content [sym-name]}]}
+                     & _]}]
+         (if (= sym-name (name form-name))
+           (z/edit zip-loc whitespace-node-for)
+           zip-loc)
+         :else zip-loc))
+
 (def cljs-rules {:features #{"cljs"}
-                 :transforms []})
+                 :transforms [(partial elide-form 'comment)
+                              (partial elide-form 'defmacro)]})
 
 (def clj-rules {:features #{"clj"}
                 :transforms []})

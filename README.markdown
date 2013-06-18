@@ -167,10 +167,8 @@ Add to your emacs config: `(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojur
 Todo
 ----
 
-+ restore (comment ...) and (defmacro ...) elision for cljs
 + easy symbol replacement
 + CLJS: Remove docstrings from namespaces.
-+ Explore providing an API that macros can easily use to transform their results
 
 Thanks
 ======

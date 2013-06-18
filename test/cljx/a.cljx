@@ -19,3 +19,6 @@
     clojure.lang.IFn (invoke [_ x] (inc x)))
 
 (defmacro increment [x] `(inc ~x))
+
+(comment foo)
+
