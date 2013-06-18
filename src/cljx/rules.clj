@@ -13,32 +13,27 @@
   [node]
   (Node. :whitespace [(whitespace-for (sj/str-pt node))]))
 
-(defmacro elide-marked
-  [kw]
-  `(fn [zip-loc#]
-     (match [(z/node zip-loc#)]
-            [{:tag :meta :content [~'_ {:tag :keyword :content [~'_ {:content [~(name kw)]}]} & ~'_]}]
-            (z/edit zip-loc# whitespace-node-for)
+(defn apply-features
+  [zip-loc features]
+  (match [(z/node zip-loc)]
+         [{:tag :reader-literal
+           :content ["#" {:tag :symbol
+                          :content [{:tag :name :content [feature-string]}]}
+                     & annotated-exprs]}]
+         (let [inclusive? (= \+ (first feature-string))
+               ;; TODO exclusive expressions, sets in any case
+               feature (subs feature-string 1)]
+           (if-not (and inclusive? (features feature))
+             (z/edit zip-loc whitespace-node-for)
+             (z/edit zip-loc
+                     assoc :content
+                     (vec (cons (Node. :whitespace [(whitespace-for (str "#" feature-string))])
+                                annotated-exprs)))))
+         :else zip-loc))
 
-            :else zip-loc#)))
+(def cljs-rules {:features #{"cljs"}
+                 :transforms []})
 
-; this is necessary because these marks are really not intended for runtime, and
-; can cause read/load errors when e.g. on strings
-(defmacro elide-mark
-  [kw]
-  `(fn [zip-loc#]
-     (match [(z/node zip-loc#)]
-            [{:tag :meta :content [~'_ {:tag :keyword :content [~'_ {:content [~(name kw)]}]} & contents#]}]
-            (z/edit zip-loc#
-                    assoc :content
-                    (vec (cons (Node. :whitespace [(whitespace-for (str "^" ~kw))])
-                               contents#)))
-
-            :else zip-loc#)))
-
-(def cljs-rules [(elide-marked :clj)
-                 (elide-mark :cljs)])
-
-(def clj-rules [(elide-marked :cljs)
-                (elide-mark :clj)])
+(def clj-rules {:features #{"clj"}
+                :transforms []})
 

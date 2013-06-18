@@ -1,14 +1,14 @@
-^:clj (ns cljx.a
+#+clj (ns cljx.a
         (:use [clojure.pprint :only [pp]]))
 
-^:cljs (ns cljx.a
+#+cljs (ns cljx.a
          (:use-macros [clojure.pprint :only [pp]]))
 
-^:cljs
+#+cljs
 (defn p [x]
   (.log js/console x))
 
-^:clj
+#+clj
 (defn p [x]
   (println x))
 

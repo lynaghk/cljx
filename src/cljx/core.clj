@@ -25,8 +25,8 @@ Returns a sequence of File objects, in breadth-first sort order."
            (filter cljx-source-file? (file-seq (io/file dir)))))
 
 (defn- walk
-  [zloc rules]
-  (let [zloc (reduce #(%2 %) zloc rules)]
+  [zloc {:keys [features transforms] :as rules}]
+  (let [zloc (reduce #(%2 %) (rules/apply-features zloc features) transforms)]
     (if-not (z/branch? zloc)
       zloc
       (->> (z/down zloc)
