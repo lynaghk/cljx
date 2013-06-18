@@ -1,50 +1,28 @@
 (ns cljx.rules
-  (:refer-clojure :exclude [==])
-  (:use [clojure.core.logic :only [matche conde pred lvar == firsto]]
-        [kibit.rules.util :only [compile-rule]]))
+  (:require [net.cgrand.sjacket :as sj]
+            [clojure.core.match :refer (match)]
+            [clojure.zip :as z]
+            [clojure.string :as str]))
 
-(defn- meta-guard [key]
-  #(-> % meta key (= true)))
+(defn- replacement-whitespace-for
+  [node]
+  (let [code (sj/str-pt node)
+        ws (str/replace code #"[^\n\r]" " ")]
+    (net.cgrand.parsley.Node. :whitespace [ws])))
 
-(defn remove-marked [key]
-  [#(matche [%]
-            ([[_ var . _]]
-               (pred var (meta-guard key)))
-            ([x]
-               (pred x (meta-guard key))))
-   #(== % :cljx.core/exclude)])
+(defmacro elide-marked
+  [kw]
+  `(fn [zip-loc#]
+     (match [(z/node zip-loc#)]
+            [{:tag :meta :content [~'_ {:tag :keyword :content [~'_ {:content [~(name kw)]}]} & ~'_]}]
+            (z/edit zip-loc# replacement-whitespace-for)
 
-(def cljs-protocols
-  (let [x (lvar)]
-    [#(conde ;; matche has some problems here; you need to match (symbol "clojure.lang.IFn"), so it doesn't really save space...
-       ((== % 'clojure.lang.IFn)  (== x 'IFn))
-       ;;other protocol renaming goes here
-       )
-     #(== % x)]))
+            :else zip-loc#)))
 
-(def cljs-types
-  (let [x (lvar)]
-    [#(conde 
-       ((== % 'clojure.lang.Atom)  (== x 'cljs.core.Atom))
-       
-       ;;Is there a nicer way to handle the trailing dot?
-       ((== % 'Error)  (== x 'js/Error))
-       ((== % 'Error.)  (== x 'js/Error.)))
-     #(== % x)]))
+(def cljs-rules [(elide-marked :clj)])
+; TODO elide (comment ...)
+; TODO elide (defmacro ...)
+; TODO generalized symbol substitution
 
-(def remove-defmacro
-  (compile-rule '[(defmacro . ?_) :cljx.core/exclude]))
+(def clj-rules [(elide-marked :cljs)])
 
-(def remove-comment
-  (compile-rule '[(comment . ?_) :cljx.core/exclude]))
-
-
-
-(def cljs-rules [cljs-protocols
-                 cljs-types
-                 (remove-marked :clj)
-                 remove-defmacro
-                 remove-comment])
-
-(def clj-rules [(remove-marked :cljs)
-                remove-comment])

@@ -2,11 +2,7 @@
   (:require [leiningen.core.eval :refer (eval-in-project)]
             [leiningen.core.project :as project]))
 
-(def no-opts-warning "You need a :cljx entry in your project.clj! It should look something like:\n
-  :cljx {:cljx-paths [\"src/cljx\"]
-         :clj-output-path \".generated/clj\"
-         :cljs-output-path \".generated/cljs\"}
-")
+(def no-opts-warning "You need a :cljx entry in your project.clj! See the cljx docs for more info.")
 
 (defn- cljx-eip
   "Evaluates the given [form] within the context of a [project].  A single
@@ -60,11 +56,9 @@ that the eval should happen in-process in a new classloader (faster!)."
   {:subtasks [#'once #'auto]}
   ([project] (cljx project "once"))
   ([project subtask]
-
-      (if-let [opts (:cljx project)]
-        (if-let [{builds :builds} opts]
-          (case subtask
-            "once" (once project builds)
-            "auto" (auto project builds)))
-
-        (println no-opts-warning))))
+   (if-let [opts (:cljx project)]
+     (if-let [{builds :builds} opts]
+       (case subtask
+         "once" (once project builds)
+         "auto" (auto project builds)))
+     (println no-opts-warning))))
