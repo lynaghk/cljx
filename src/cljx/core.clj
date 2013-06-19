@@ -56,14 +56,15 @@ Returns a sequence of File objects, in breadth-first sort order."
   (.getAbsolutePath (io/file output-dir (str (relativize source source-path)))))
 
 (defn generate
-  [{:keys [source-path output-path extension rules] :as options}]
+  [{:keys [source-path output-path rules] :as options}]
   (println "Rewriting" source-path "to" output-path
-           (str "(" extension ")")
-           "with" (count rules) "rules.")
+           (str "(" (:filetype rules) ")")
+           "with features" (:features rules) "and"
+           (count (:transforms rules)) "transformations.")
   (doseq [f (find-cljx-sources-in-dir source-path)
           :let [result (transform (slurp f) rules)
                 destination (str/replace (destination-path f source-path output-path)
-                                         #"\.[^\.]+" (str "." extension))]]
+                                         #"\.[^\.]+" (str "." (:filetype rules)))]]
     (doto destination
       io/make-parents
       (spit (with-out-str
@@ -73,14 +74,26 @@ Returns a sequence of File objects, in breadth-first sort order."
 
 (defn cljx-compile [builds]
   "The actual static transform, separated out so it can be called repeatedly."
-  (doseq [build builds
-          :let [{:keys [source-paths output-path extension rules] :as opts}
-                (merge {:extension "clj"} build)]]
-    (let [rules (if-not (symbol? rules)
-                  (eval rules)
-                  (do
+  (doseq [{:keys [source-paths output-path rules] :as build} builds]
+    (let [rules (cond
+                  (= :clj rules) rules/clj-rules
+                  (= :cljs rules) rules/cljs-rules
+                  (symbol? rules) (do
                     (require (symbol (namespace rules)))
-                    @(resolve rules)))]
+                    @(resolve rules))
+                  :default (eval rules))]
       (doseq [p source-paths]
-        (generate (assoc opts :rules rules :source-path p))))))
+        (generate (assoc build :rules rules :source-path p))))))
 
+(def s "(ns example
+  (#+clj :use #+cljs :use-macros [c2.macros :only (combine-with)]))
+
+(defn x-to-string
+  [x]
+  (let [buf #+clj (StringBuilder.) #+cljs (gstring/StringBuffer.)]
+    (.append buf \"x is: \")
+    (.append buf (str x))))
+
+(reify
+  clojure.lang.IFn
+  (invoke [_ x] (inc x)))")

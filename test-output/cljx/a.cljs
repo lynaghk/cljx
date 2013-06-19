@@ -16,7 +16,7 @@
   (+ x x))
 
 (reify
-    clojure.lang.IFn (invoke [_ x] (inc x)))
+    cljs.core.IFn    (invoke [_ x] (inc x)))
 
                                   
 

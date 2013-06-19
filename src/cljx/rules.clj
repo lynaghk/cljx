@@ -36,17 +36,41 @@
   (match [(z/node zip-loc)]
          [{:tag :list
            :content ["(" {:tag :symbol
-                          :content [{:tag :name :content [sym-name]}]}
+                          :content [{:tag :name
+                                     :content [(sym-name :guard #(= % form-name))]}]}
                      & _]}]
-         (if (= sym-name (name form-name))
-           (z/edit zip-loc whitespace-node-for)
-           zip-loc)
+         (z/edit zip-loc whitespace-node-for)
          :else zip-loc))
 
-(def cljs-rules {:features #{"cljs"}
-                 :transforms [(partial elide-form 'comment)
-                              (partial elide-form 'defmacro)]})
+(defn- pad1
+  [replacement original]
+  (apply str replacement (repeat (- (count original) (count replacement)) \space)))
 
-(def clj-rules {:features #{"clj"}
+(defn replace-symbols
+  [symbols-map zip-loc]
+  (match [(z/node zip-loc)]
+         [{:tag :symbol
+           :content [{:tag :name
+                      :content [(symbol-name :guard (comp symbols-map symbol))]}]}]
+         (z/edit zip-loc update-in [:content 0 :content 0]
+                 #(-> % symbol symbols-map name (pad1 %)))
+         :else zip-loc))
+
+; TODO unsure of the utility of this...
+(def ^:private clj->cljs-symbols
+  (->> '[IFn]
+       (map name)
+       (map #(vector (str "clojure.lang." %) (str "cljs.core." %)))
+       (map (partial mapv symbol))
+       (into {})))
+
+(def cljs-rules {:filetype "cljs"
+                 :features #{"cljs"}
+                 :transforms [(partial elide-form "comment")
+                              (partial elide-form "defmacro")
+                              (partial replace-symbols clj->cljs-symbols)]})
+
+(def clj-rules {:filetype "clj"
+                :features #{"clj"}
                 :transforms []})
 

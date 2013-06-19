@@ -13,12 +13,10 @@
 
   :cljx {:builds [{:source-paths ["test"]
                    :output-path "target/test-output"
-                   :rules cljx.rules/clj-rules
-                   :extension "clj"}
+                   :rules :clj}
                   {:source-paths ["test"]
                    :output-path "target/test-output"
-                   :rules cljx.rules/cljs-rules
-                   :extension "cljs"}]}
+                   :rules :cljs}]}
 
   :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-1820"]]
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
