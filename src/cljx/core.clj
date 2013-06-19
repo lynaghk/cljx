@@ -64,7 +64,7 @@ Returns a sequence of File objects, in breadth-first sort order."
   (doseq [f (find-cljx-sources-in-dir source-path)
           :let [result (transform (slurp f) rules)
                 destination (str/replace (destination-path f source-path output-path)
-                                         #"\.[^\.]+" (str "." (:filetype rules)))]]
+                                         #"\.[^\.]+$" (str "." (:filetype rules)))]]
     (doto destination
       io/make-parents
       (spit (with-out-str
@@ -85,15 +85,3 @@ Returns a sequence of File objects, in breadth-first sort order."
       (doseq [p source-paths]
         (generate (assoc build :rules rules :source-path p))))))
 
-(def s "(ns example
-  (#+clj :use #+cljs :use-macros [c2.macros :only (combine-with)]))
-
-(defn x-to-string
-  [x]
-  (let [buf #+clj (StringBuilder.) #+cljs (gstring/StringBuffer.)]
-    (.append buf \"x is: \")
-    (.append buf (str x))))
-
-(reify
-  clojure.lang.IFn
-  (invoke [_ x] (inc x)))")
