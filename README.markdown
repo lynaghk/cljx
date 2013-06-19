@@ -69,6 +69,14 @@ hook:
 :hooks [cljx.hooks]
 ```
 
+## Changelog
+
+See `CHANGES.md` at the root of this repo.
+
+(You'll especially want to look at the entry for `0.3.0` if you've been using
+previous versions of cljx, as things have changed [of course, we think
+significantly for the better :-P].)
+
 ## Usage
 
 Cljx can be run `once` or `auto`; if the latter (e.g. `lein cljx auto`), it will
@@ -206,7 +214,6 @@ nREPL session's environment; this is entirely automatic.
 Currently, only cljx's default rulesets are used in this case (though you can
 work around this by making your own higher-order cljx nREPL middleware that uses
 whatever rulesets you want).
-
 
 ### Misc
 
