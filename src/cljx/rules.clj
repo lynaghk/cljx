@@ -53,7 +53,8 @@
   (match [(z/node zip-loc)]
          [{:tag :symbol
            :content [{:tag :name
-                      :content [(symbol-name :guard (comp symbols-map symbol))]}]}]
+                      :content [(symbol-name :guard #(and (string? %)
+                                                          (-> % symbol symbols-map)))]}]}]
          (z/edit zip-loc update-in [:content 0 :content 0]
                  #(-> % symbol symbols-map name (pad1 %)))
          :else zip-loc))
