@@ -18,7 +18,9 @@
   (match [(z/node zip-loc)]
          [{:tag :reader-literal
            :content ["#" {:tag :symbol
-                          :content [{:tag :name :content [feature-string]}]}
+                          :content [{:tag :name
+                                     :content [(feature-string
+                                                 :guard #(re-find #"^[\-\+]" %))]}]}
                      & annotated-exprs]}]
          (let [inclusive? (= \+ (first feature-string))
                ;; TODO exclusive expressions, sets in any case

@@ -22,3 +22,6 @@
 
 (comment foo)
 
+; making sure other tagged literals are left untouched
+#whatever [1 2 3]
+
