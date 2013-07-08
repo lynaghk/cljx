@@ -52,7 +52,7 @@ Clojure sources, DOM manipulation stuffs always in ClojureScript sources, etc).
 To use it, add to your `project.clj`:
 
 ```clojure
-:plugins [[com.keminglabs/cljx "0.3.0"]]
+:plugins [[org.clojars.cemerick/cljx "0.3.0-SNAPSHOT"]]
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path "target/generated/clj"
                  :rules :clj}
@@ -200,7 +200,7 @@ middleware in your `:dev` profile (along with
 be interacting with ClojureScript REPLs as well):
 
 ```clojure
-:profiles {:dev {:dependencies [[com.keminglabs/cljx "0.2.2"]]
+:profiles {:dev {:dependencies [[org.clojars.cemerick/cljx "0.3.0-SNAPSHOT"]]
                  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
                                                    cljx.repl-middleware/wrap-cljx]}}}
 ```
