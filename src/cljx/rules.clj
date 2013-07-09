@@ -69,8 +69,7 @@
 
 (def cljs-rules {:filetype "cljs"
                  :features #{"cljs"}
-                 :transforms [(partial elide-form "comment")
-                              (partial elide-form "defmacro")
+                 :transforms [(partial elide-form "defmacro")
                               (partial replace-symbols clj->cljs-symbols)]})
 
 (def clj-rules {:filetype "clj"
