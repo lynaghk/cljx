@@ -16,7 +16,7 @@
           (h (assoc msg :code (cljx/transform code rules)))
           
           (and (= op "load-file") file (re-matches #".+\.cljx$" file-name))
-          (h (assoc msg :file (cljx/transform code rules)))
+          (h (assoc msg :file (cljx/transform file rules)))
           
           :else (h msg))))))
 
