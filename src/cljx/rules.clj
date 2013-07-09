@@ -59,8 +59,9 @@
                  #(-> % symbol symbols-map name (pad1 %)))
          :else zip-loc))
 
-; TODO unsure of the utility of this...
-(def ^:private clj->cljs-symbols
+; disabled until a full solution can be proffered
+; see gh-11
+#_(def ^:private clj->cljs-symbols
   (->> '[IFn]
        (map name)
        (map #(vector (str "clojure.lang." %) (str "cljs.core." %)))
@@ -70,7 +71,9 @@
 (def cljs-rules {:filetype "cljs"
                  :features #{"cljs"}
                  :transforms [(partial elide-form "defmacro")
-                              (partial replace-symbols clj->cljs-symbols)]})
+                              ; disabled until a full solution can be proffered,
+                              ; see gh-11
+                              #_(partial replace-symbols clj->cljs-symbols)]})
 
 (def clj-rules {:filetype "clj"
                 :features #{"clj"}

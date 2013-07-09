@@ -16,7 +16,9 @@
   (+ x x))
 
 (reify
-    cljs.core.IFn    (invoke [_ x] (inc x)))
+                        
+         cljs.core.IFn
+  (invoke [_ x] (inc x)))
 
                                   
 

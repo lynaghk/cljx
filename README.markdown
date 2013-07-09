@@ -152,9 +152,7 @@ E.g., the `.cljx` source containing
 Notice that only the `#+cljs`-annotated expressions remain, and that everything
 is still in the same position as it was in the `.cljx` file; this last
 fact means that line and column numbers produced by the resulting
-Clojure/ClojureScript code will remain true to the original sources.  Also, the
-default ClojureScript ruleset includes a global symbol-replacement transform
-that replaces known `clojure.lang.*` types with their `cljs.core.*` equivalents.
+Clojure/ClojureScript code will remain true to the original sources.
 
 The `#+feature-name` "annotation" syntax is shamelessly stolen from [Common
 Lisp](http://www.lispworks.com/documentation/lw50/CLHS/Body/02_dhq.htm) (and is

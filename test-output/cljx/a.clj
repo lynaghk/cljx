@@ -16,7 +16,9 @@
   (+ x x))
 
 (reify
-    clojure.lang.IFn (invoke [_ x] (inc x)))
+        clojure.lang.IFn
+                      
+  (invoke [_ x] (inc x)))
 
 (defmacro increment [x] `(inc ~x))
 
