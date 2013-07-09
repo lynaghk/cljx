@@ -13,7 +13,7 @@ This variant of eval-in-project implicitly adds the current :plugin dep on
 cljx to the main :dependencies vector of the project, as well as specifying
 that the eval should happen in-process in a new classloader (faster!)."
   [project init form]
-  (let [cljx-plugin (filter (comp #(= % 'com.keminglabs/cljx) first)
+  (let [cljx-plugin (filter (comp #{'com.keminglabs/cljx 'org.clojars.cemerick/cljx} first)
                             (:plugins project))]
     (eval-in-project
       (-> project
