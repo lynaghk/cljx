@@ -245,7 +245,8 @@ Get the same syntax highlighting of `.cljx` files as you currently do for `.clj`
 
 ## Thanks
 
-* @jonase and @ohpauleez for enabling cljx in the first place
+* @jonase and @ohpauleez for enabling the first [kibit](https://github.com/jonase/kibit)-based cljx
+* @cemerick for design chats, maintaining and extending cljx, and rewriting the core to use sjacket
 * @cgrand and @trptcolin for [sjacket](https://github.com/cgrand/sjacket)
 * @swannodette for [core.match](https://github.com/clojure/core.match)
 
