@@ -3,3 +3,4 @@ lib/
 test/generated
 pom.xml
 target/
+bin

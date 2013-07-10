@@ -2,11 +2,7 @@
   (:require [leiningen.core.eval :refer (eval-in-project)]
             [leiningen.core.project :as project]))
 
-(def no-opts-warning "You need a :cljx entry in your project.clj! It should look something like:\n
-  :cljx {:cljx-paths [\"src/cljx\"]
-         :clj-output-path \".generated/clj\"
-         :cljs-output-path \".generated/cljs\"}
-")
+(def no-opts-warning "You need a :cljx entry in your project.clj! See the cljx docs for more info.")
 
 (defn- cljx-eip
   "Evaluates the given [form] within the context of a [project].  A single
@@ -17,7 +13,7 @@ This variant of eval-in-project implicitly adds the current :plugin dep on
 cljx to the main :dependencies vector of the project, as well as specifying
 that the eval should happen in-process in a new classloader (faster!)."
   [project init form]
-  (let [cljx-plugin (filter (comp #(= % 'com.keminglabs/cljx) first)
+  (let [cljx-plugin (filter (comp #{'com.keminglabs/cljx 'org.clojars.cemerick/cljx} first)
                             (:plugins project))]
     (eval-in-project
       (-> project
@@ -34,12 +30,12 @@ that the eval should happen in-process in a new classloader (faster!)."
   (cljx-eip project
     '(require 'cljx.core)
     `(do
-       ; ensure namespaces containing vars named in data_readers.clj files are loaded
-       ; once Leiningen uses Clojure 1.5.0, we can :eval-in :classloader
-       ; and bind *default-data-reader-fn* to a dummy type that prints just like
-       ; the tagged literals that we read
-       (doseq [v# (vals *data-readers*)] (require (-> v# .ns str symbol)))
-       (#'cljx.core/cljx-compile '~builds))))
+       (#'cljx.core/cljx-compile '~builds)
+       ; if users have :injections that start any agents, *and* we're in our own
+       ; process, we need to shut them down so that e.g. `lein cljx once`
+       ; doesn't take 60s
+       ~(when (-> project :eval-in name (= "subprocess"))
+          '(shutdown-agents)))))
 
 (defn- auto
   "Watch .cljx files and transform them after any changes."
@@ -60,11 +56,9 @@ that the eval should happen in-process in a new classloader (faster!)."
   {:subtasks [#'once #'auto]}
   ([project] (cljx project "once"))
   ([project subtask]
-
-      (if-let [opts (:cljx project)]
-        (if-let [{builds :builds} opts]
-          (case subtask
-            "once" (once project builds)
-            "auto" (auto project builds)))
-
-        (println no-opts-warning))))
+   (if-let [opts (:cljx project)]
+     (if-let [{builds :builds} opts]
+       (case subtask
+         "once" (once project builds)
+         "auto" (auto project builds)))
+     (println no-opts-warning))))

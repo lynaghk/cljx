@@ -11,113 +11,176 @@
                  \______/           
 
 
-Cljx is a Lein plugin that emits Clojure and ClojureScript code from a single
-metadata-annotated codebase.
+Cljx is a [Leiningen](https://github.com/technomancy/leiningen) plugin that
+emits Clojure and ClojureScript code from a single annotated codebase.
+Effectively, it is an s-expression preprocessor:
 
-To use it, add it to your `project.clj`:
-
-```clojure
-:plugins [[com.keminglabs/cljx "0.2.2"]]
-:cljx {:builds [{:source-paths ["src/cljx"]
-                 :output-path ".generated/clj"
-                 :rules cljx.rules/clj-rules}
-                  
-                {:source-paths ["src/cljx"]
-                 :output-path ".generated/cljs"
-                 :extension "cljs"
-                 :include-meta true
-                 :rules cljx.rules/cljs-rules}]}
+```
+             +-----------+
+             |           |
+             | .cljx     |
+             | sources   |
+             |           |
+             +-----+-----+
+                   |
+                   |
+                   |
+             +-----v-----+       +----------------+
+             |           |       |                |
+             | cljx      <-------+  configuration |
+             | Leiningen |       |       +        |
+             | plugin    |       |     rules      |
+             +--+--+-----+       +----------------+
+                |  |
+                |  |
+ +------------+ |  | +------------+
+ |            | |  | |            |
+ |   .clj     <-+  +->   .cljs    |
+ |   sources  |      |   sources  |
+ |            |      |            |
+ +------------+      +------------+
 ```
 
-Can be run "once" or "auto", in which case it will watch all source-paths for
-changes to .cljx files.  Defaults to "once".
+When using cljx, you put APIs and implementations that are meant to be
+fundamentally portable between Clojure and ClojureScript into one annotated
+`.cljx` codebase, and leave things that are necessarily tied to a single
+compilation target in their "native" language (e.g. macros should always be in
+Clojure sources, DOM manipulation stuffs always in ClojureScript sources, etc).
 
-Add
+## "Installation"
+
+To use it, add to your `project.clj`:
+
+```clojure
+:plugins [[com.keminglabs/cljx "0.3.0"]]
+:cljx {:builds [{:source-paths ["src/cljx"]
+                 :output-path "target/generated/clj"
+                 :rules :clj}
+                  
+                {:source-paths ["src/cljx"]
+                 :output-path "target/generated/cljs"
+                 :rules :cljs}]}
+```
+To automatically run cljx before starting a REPL, cutting a jar, etc., add its
+
+hook:
 
 ```clojure
 :hooks [cljx.hooks]
 ```
 
-to automatically run cljx before starting a REPL, cutting a JAR, etc.
+## Changelog
 
-Available options include:
+See `CHANGES.md` at the root of this repo.
 
-* `:nested-exclusions` — When true, `^:clj` and `^:cljs` metadata (used to
-  indicate target-specific inclusions/exclusions) may be used on "nested"
-  (non-top-level) forms (defaults `false`)
-* `:maintain-form-position` – When true, the line positions of transformed cljx
-  forms are maintained, which aligns error and debug info (e.g. line numbers in
-  stack traces, ClojureScript source maps, etc) in the generated files with
-  those in the source cljx files (defaults `false`)
-* `:include-meta` — pass code-level metadata along to generated Clojure and
-  ClojureScript (defaults `false`)
-* `:extension` — a string indicating the target of a given "build" (defaults
-  `"clj"`)
-* `:rules` — a fully-qualified symbol that names a var containing the rules to
-  be used
+(You'll especially want to look at the entry for `0.3.0` if you've been using
+previous versions of cljx, as things have changed [of course, we think
+significantly for the better :-P].)
 
-The included clj and cljs rule sets will remove forms marked with
-platform-specific metadata and rename protocols as appropriate.
+## Usage
+
+Cljx can be run `once` or `auto`; if the latter (e.g. `lein cljx auto`), it will
+watch all `source-paths` for changes to `.cljx` files.  `once` is the default.
+
+Each build (i.e. maps in the `:builds` vector in the `:cljx` configuration) can
+be configured with the following options:
+
+* `:source-paths`, a sequence of the source roots that contain your `.cljx`
+  files.  Note that putting your `.cljx` files in your "regular" Leiningen
+  project's `:source-paths` (by default, `"src"`) is not recommended; doing so
+  will likely lead to them being included in e.g. jar files created by
+  Leiningen.  Better to keep them separate, and use cljx to direct Clojure and
+  CLojureScript sources whereever they will be picked up by other tooling.
+* `:output-path`, the root directory where cljx's output will land.  Common
+  options are `"target/classes"` for both Clojure and ClojureScript files you
+  plan on distributing as a library; or, in an application project using
+  [lein-cljsbuild](https://github.com/emezeske/lein-cljsbuild) to produce
+  deployable JavaScript, sending cljx-produced Clojure output to
+  `"target/classes"` (so it's on the classpath and available to be added to a
+  jar/war) and ClojureScript output to a dummy directory (e.g.
+  `"target/generated/cljs"`) that can be a source path in your lein-cljsbuild
+  configuration(s).
+* `:rules` can be one of:
+ * `:clj` or `:cljs` to use cljx's default Clojure or ClojureScript ruleset
+   (`cljx.rules/clj-rules` and `cljx.rules/cljs-rules`, respectively)
+ * a map that specifies the three slots that make up a cljx ruleset:
+  * `:filetype`, a string that defines what the extension of output filenames
+    will be, e.g. `"cljs"`
+  * `:features`, a _set_ of strings, each naming an enabled "feature"; code in
+    `.cljx` files that is annotated with a feature that is not included in this
+    set will be pruned in the output
+  * `:transforms`, a sequence of functions that are applied to each expression
+    in each input file, and can modify that expression without constraint
+ * a fully-qualified symbol that names a var containing a map as described above
+
+In general, you'll never need to go beyond the named cljx-provided rules.
 
 E.g., the `.cljx` source containing
 
 ```clojure
-^:clj (ns c2.maths
-        (:use [c2.macros :only [combine-with]]))
-^:cljs (ns c2.maths
-         (:use-macros [c2.macros :only [combine-with]]))
+(ns example
+  (#+clj :use #+cljs :use-macros [c2.macros :only (combine-with)]))
 
-(defn ^:clj sin [x] (Math/sin x))
-(defn ^:cljs sin [x] (.sin js/Math x))
+(defn x-to-string
+  [x]
+  (let [buf #+clj (StringBuilder.) #+cljs (gstring/StringBuffer.)]
+    (.append buf "x is: ")
+    (.append buf (str x))))
 
 (reify
-  clojure.lang.IFn
+  #+clj clojure.lang.IFn
+  #+cljs cljs.core.IFn
   (invoke [_ x] (inc x)))
 ```
 
-will, when run through `cljx.rules/cljs-rules`, yield:
+…will, when transformed using the `:cljs` ruleset, yield:
 
 ```clojure
-(ns c2.maths
-  (:use-macros [c2.macros :only [combine-with]]))
+(ns example
+  (                  :use-macros [c2.macros :only (combine-with)]))
 
-(defn sin [x] (.sin js/Math x))
+(defn x-to-string
+  [x]
+  (let [buf                               (gstring/StringBuffer.)]
+    (.append buf "x is: ")
+    (.append buf (str x))))
 
 (reify
-  IFn
+                       
+         cljs.core.IFn
   (invoke [_ x] (inc x)))
 ```
 
-The value associated with `:rules` should be a symbol naming a var containing
-the rules to use for that build.  `cljx.rules/cljs-rules` and `cljx.rules/clj-rules`
-are provided as a convenience, but you can extend those (or replace them entirely).
-For example, a namespace on your classpath like this defines some rules:
+Notice that only the `#+cljs`-annotated expressions remain, and that everything
+is still in the same position as it was in the `.cljx` file; this last
+fact means that line and column numbers produced by the resulting
+Clojure/ClojureScript code (e.g. in error messages, stack traces/frames,
+debuggers, source maps, etc) will remain true to the original sources.
 
-```clojure
-(ns my.rules
-  (:require [kibit.rules.util :refer (compile-rule defrules)]))
+The `#+feature-name` "annotation" syntax is shamelessly stolen from [Common
+Lisp](http://www.lispworks.com/documentation/lw50/CLHS/Body/02_dhq.htm) (and is
+perhaps being considered for inclusion in Clojure[Script] itself?...see [feature
+expressions](http://dev.clojure.org/display/design/Feature+Expressions)).  Cljx
+only supports the simplest form of the syntax; other forms can be considered
+valid TODOs:
 
-(defrules rules
-  [(+ ?x 1) (inc ?x)]
-  [(- ?x 1) (dec ?x)])
-```
+* Exclusionary annotations, e.g. `#-cljs`
+* "Union" annotations, e.g. `#+(or clj clr)`
 
-Now you can use those rules in a cljx build like so:
+### Examples
 
-```clojure   
-:rules my.rules/rules
-```
+Some real-world examples of projects that use cljx:
 
-The var's namespace will be automatically loaded by cljx (i.e. no need to do so
-manually via the `:injections` key in your `project.clj`).
+* [pprng](https://github.com/cemerick/pprng/)
+* [data.generators](https://github.com/cemerick/data.generators)
 
-Forms that are converted into `:cljx.core/exclude` will be excluded from the output.
-See [Kibit](http://github.com/jonase/kibit) for more info on writing rules, and
-[C2](https://github.com/lynaghk/c2) for a project that uses `.cljx` heavily.
+<!-- TODO wait if/when C2 moves to new annotation approach
+* [C2](https://github.com/lynaghk/c2)
+-->
 
 
-Clojure is a hosted language
-----------------------------
+### Clojure is a hosted language, in all flavours
+
 Cljx does *not* try to hide implementation differences between host platforms.
 Clojure has ints, floats, longs, &c., ClojureScript has number; Clojure regular
 expressions act differently than ClojureScript regular expressions, because
@@ -125,13 +188,15 @@ expressions act differently than ClojureScript regular expressions, because
 
 Cljx only tries to unify Clojure/ClojureScript abstractions when it makes sense.
 E.g., converting `clojure.lang.IFn` into `IFn` when generating ClojureScript.
+The rest is up to you, in annotating your code to include or exclude what's
+needed by each runtime.
 
 Also, note that *cljx has no effect on code produced by macros*.
 Macroexpansion occurs long after cljx touches your code.
 
 
-REPL Integration
-----------------
+### REPL Integration
+
 Cljx provides an nREPL middleware that allows you to work with `.cljx` files in
 the same way you work with regular `.clj` files from any toolchain with good
 nREPL support, like [nrepl.el](https://github.com/kingtim/nrepl.el),
@@ -143,7 +208,7 @@ middleware in your `:dev` profile (along with
 be interacting with ClojureScript REPLs as well):
 
 ```clojure
-:profiles {:dev {:dependencies [[com.keminglabs/cljx "0.2.2"]]
+:profiles {:dev {:dependencies [[com.keminglabs/cljx "0.3.0"]]
                  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
                                                    cljx.repl-middleware/wrap-cljx]}}}
 ```
@@ -158,21 +223,30 @@ Currently, only cljx's default rulesets are used in this case (though you can
 work around this by making your own higher-order cljx nREPL middleware that uses
 whatever rulesets you want).
 
+### Misc
 
-Misc
-----
-Emacs users, want syntax highlighting?
-Add to your emacs config: `(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`.
+#### Syntax highlighting
 
-Todo
-----
+Get the same syntax highlighting of `.cljx` files as you currently do for `.clj` files!
 
-+ CLJS: Remove docstrings from namespaces.
-+ Explore providing an API that macros can easily use to transform their results
+##### Emacs
 
-Thanks
-======
-@jonase & @ohpauleez for kibit
-@swannodette for core.logic
+`(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`
+
+##### Vim
+
+`autocmd BufNewFile,BufReadPost *.cljx setfiletype clojure`
+
+##### Eclipse + CounterClockwise
+
+1. In Preferences, go to General > Editors > File Associations.
+2. Add a `*.cljx` file type in the upper list.
+3. Add an editor association for that `*.cljx` file type to Counterclockwise's `Clojure Editor`.
+
+## Thanks
+
+* @jonase and @ohpauleez for enabling cljx in the first place
+* @cgrand and @trptcolin for [sjacket](https://github.com/cgrand/sjacket)
+* @swannodette for [core.match](https://github.com/clojure/core.match)
 
 
