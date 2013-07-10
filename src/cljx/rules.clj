@@ -1,50 +1,81 @@
 (ns cljx.rules
-  (:refer-clojure :exclude [==])
-  (:use [clojure.core.logic :only [matche conde pred lvar == firsto]]
-        [kibit.rules.util :only [compile-rule]]))
+  (:require [net.cgrand.sjacket :as sj]
+            [clojure.core.match :refer (match)]
+            [clojure.zip :as z]
+            [clojure.string :as str])
+  (:import net.cgrand.parsley.Node))
 
-(defn- meta-guard [key]
-  #(-> % meta key (= true)))
+(defn- whitespace-for
+  [string]
+  (str/replace string #"[^\n\r]" " "))
 
-(defn remove-marked [key]
-  [#(matche [%]
-            ([[_ var . _]]
-               (pred var (meta-guard key)))
-            ([x]
-               (pred x (meta-guard key))))
-   #(== % :cljx.core/exclude)])
+(defn- whitespace-node-for
+  [node]
+  (Node. :whitespace [(whitespace-for (sj/str-pt node))]))
 
-(def cljs-protocols
-  (let [x (lvar)]
-    [#(conde ;; matche has some problems here; you need to match (symbol "clojure.lang.IFn"), so it doesn't really save space...
-       ((== % 'clojure.lang.IFn)  (== x 'IFn))
-       ;;other protocol renaming goes here
-       )
-     #(== % x)]))
+(defn apply-features
+  [zip-loc features]
+  (match [(z/node zip-loc)]
+         [{:tag :reader-literal
+           :content ["#" {:tag :symbol
+                          :content [{:tag :name
+                                     :content [(feature-string
+                                                 :guard #(re-find #"^[\-\+]" %))]}]}
+                     & annotated-exprs]}]
+         (let [inclusive? (= \+ (first feature-string))
+               ;; TODO exclusive expressions, sets in any case
+               feature (subs feature-string 1)]
+           (if-not (and inclusive? (features feature))
+             (z/edit zip-loc whitespace-node-for)
+             (z/edit zip-loc
+                     assoc :content
+                     (vec (cons (Node. :whitespace [(whitespace-for (str "#" feature-string))])
+                                annotated-exprs)))))
+         :else zip-loc))
 
-(def cljs-types
-  (let [x (lvar)]
-    [#(conde 
-       ((== % 'clojure.lang.Atom)  (== x 'cljs.core.Atom))
-       
-       ;;Is there a nicer way to handle the trailing dot?
-       ((== % 'Error)  (== x 'js/Error))
-       ((== % 'Error.)  (== x 'js/Error.)))
-     #(== % x)]))
+(defn elide-form
+  [form-name zip-loc]
+  (match [(z/node zip-loc)]
+         [{:tag :list
+           :content ["(" {:tag :symbol
+                          :content [{:tag :name
+                                     :content [(sym-name :guard #(= % form-name))]}]}
+                     & _]}]
+         (z/edit zip-loc whitespace-node-for)
+         :else zip-loc))
 
-(def remove-defmacro
-  (compile-rule '[(defmacro . ?_) :cljx.core/exclude]))
+(defn- pad1
+  [replacement original]
+  (apply str replacement (repeat (- (count original) (count replacement)) \space)))
 
-(def remove-comment
-  (compile-rule '[(comment . ?_) :cljx.core/exclude]))
+(defn replace-symbols
+  [symbols-map zip-loc]
+  (match [(z/node zip-loc)]
+         [{:tag :symbol
+           :content [{:tag :name
+                      :content [(symbol-name :guard #(and (string? %)
+                                                          (-> % symbol symbols-map)))]}]}]
+         (z/edit zip-loc update-in [:content 0 :content 0]
+                 #(-> % symbol symbols-map name (pad1 %)))
+         :else zip-loc))
 
+; disabled until a full solution can be proffered
+; see gh-11
+#_(def ^:private clj->cljs-symbols
+  (->> '[IFn]
+       (map name)
+       (map #(vector (str "clojure.lang." %) (str "cljs.core." %)))
+       (map (partial mapv symbol))
+       (into {})))
 
+(def cljs-rules {:filetype "cljs"
+                 :features #{"cljs"}
+                 :transforms [(partial elide-form "defmacro")
+                              ; disabled until a full solution can be proffered,
+                              ; see gh-11
+                              #_(partial replace-symbols clj->cljs-symbols)]})
 
-(def cljs-rules [cljs-protocols
-                 cljs-types
-                 (remove-marked :clj)
-                 remove-defmacro
-                 remove-comment])
+(def clj-rules {:filetype "clj"
+                :features #{"clj"}
+                :transforms []})
 
-(def clj-rules [(remove-marked :cljs)
-                remove-comment])
