@@ -5,7 +5,8 @@
 Mostly a rewrite to use [sjacket](https://github.com/cgrand/sjacket), removing
 all dependency on the Clojure reader and thereby eliminating all of the issues
 that go along with it (e.g. lossy representation, line number changes when
-emitting Clojure[Script], [issues like this](), etc).
+emitting Clojure[Script],
+[issues like this](https://github.com/jonase/kibit/issues/14), etc).
 
 The syntax for annotations has changed, as described in the readme.  tl;dr, all
 you need to do is `s/\^:(cljs?)/#+$1/g`.  The only gotcha is that putting
