@@ -128,7 +128,8 @@ E.g., the `.cljx` source containing
     (.append buf (str x))))
 
 (reify
-  clojure.lang.IFn
+  #+clj clojure.lang.IFn
+  #+cljs cljs.core.IFn
   (invoke [_ x] (inc x)))
 ```
 
@@ -145,14 +146,16 @@ E.g., the `.cljx` source containing
     (.append buf (str x))))
 
 (reify
-  clojure.lang.IFn
+                       
+         cljs.core.IFn
   (invoke [_ x] (inc x)))
 ```
 
 Notice that only the `#+cljs`-annotated expressions remain, and that everything
 is still in the same position as it was in the `.cljx` file; this last
 fact means that line and column numbers produced by the resulting
-Clojure/ClojureScript code will remain true to the original sources.
+Clojure/ClojureScript code (e.g. in error messages, stack traces/frames,
+debuggers, source maps, etc) will remain true to the original sources.
 
 The `#+feature-name` "annotation" syntax is shamelessly stolen from [Common
 Lisp](http://www.lispworks.com/documentation/lw50/CLHS/Body/02_dhq.htm) (and is
@@ -164,8 +167,15 @@ valid TODOs:
 * Exclusionary annotations, e.g. `#-cljs`
 * "Union" annotations, e.g. `#+(or clj clr)`
 
+### Examples
+
+Some real-world examples of projects that use cljx:
+
+* [pprng](https://github.com/cemerick/pprng/)
+* [data.generators](https://github.com/cemerick/data.generators)
+
 <!-- TODO wait if/when C2 moves to new annotation approach
-[C2](https://github.com/lynaghk/c2) for a project that uses `.cljx` heavily.
+* [C2](https://github.com/lynaghk/c2)
 -->
 
 
@@ -215,12 +225,23 @@ whatever rulesets you want).
 
 ### Misc
 
-Emacs users, want syntax highlighting?
-Add to your emacs config: `(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`.
+#### Syntax highlighting
 
-## Todo
+Get the same syntax highlighting of `.cljx` files as you currently do for `.clj` files!
 
-+ CLJS: Remove docstrings from namespaces.
+##### Emacs
+
+`(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`
+
+##### Vim
+
+`autocmd BufNewFile,BufReadPost *.cljx setfiletype clojure`
+
+##### Eclipse + CounterClockwise
+
+1. In Preferences, go to General > Editors > File Associations.
+2. Add a `*.cljx` file type in the upper list.
+3. Add an editor association for that `*.cljx` file type to Counterclockwise's `Clojure Editor`.
 
 ## Thanks
 
