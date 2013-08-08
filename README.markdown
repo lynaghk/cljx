@@ -171,6 +171,7 @@ valid TODOs:
 
 Some real-world examples of projects that use cljx:
 
+* [formative](https://github.com/jkk/formative)
 * [pprng](https://github.com/cemerick/pprng/)
 * [data.generators](https://github.com/cemerick/data.generators)
 
