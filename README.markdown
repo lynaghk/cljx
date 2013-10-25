@@ -52,7 +52,7 @@ Clojure sources, DOM manipulation stuffs always in ClojureScript sources, etc).
 To use it, add to your `project.clj`:
 
 ```clojure
-:plugins [[com.keminglabs/cljx "0.3.0"]]
+:plugins [[com.keminglabs/cljx "0.3.1"]]
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path "target/generated/clj"
                  :rules :clj}
