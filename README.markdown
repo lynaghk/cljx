@@ -203,22 +203,25 @@ the same way you work with regular `.clj` files from any toolchain with good
 nREPL support, like [nrepl.el](https://github.com/kingtim/nrepl.el),
 [Counterclockwise](http://code.google.com/p/counterclockwise/), etc.
 
-In your project, _in addition_ to adding cljx as a plugin, just add its
-middleware in your `:dev` profile (along with
-[Piggieback](https://github.com/cemerick/piggieback)'s, assuming you're going to
-be interacting with ClojureScript REPLs as well):
+When you add cljx as a `:plugin` to your Leiningen project:
 
-```clojure
-:profiles {:dev {:dependencies [[com.keminglabs/cljx "0.3.0"]]
-                 :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
-                                                   cljx.repl-middleware/wrap-cljx]}}}
-```
+1. The cljx and [Piggieback](https://github.com/cemerick/piggieback) nREPL
+  middlewares will automatically be added to your `:repl-options`
+2. Cljx itself will be added as a project dependency (this will only affect REPL
+  processes, and won't leak out into your project's `pom.xml`, influencing
+  downstream users of your library, if you're writing one)
 
-Now all REPL evaluations and `load-file` operations will be processed by cljx
-appropriately before they reach the Clojure or ClojureScript compiler.  Whether
-cljx code is processed for Clojure or ClojureScript is determined by the
-existence [or not] of a Piggieback ClojureScript environment in your current
-nREPL session's environment; this is entirely automatic.
+(Note that this does not conflict with using the 
+[Austin](http://github.com/cemerick/austin) plugin to automate the configuration
+of your project to use Piggieback.  In fact, the pairing is highly recommended
+for making the ClojureScript REPL side of your cljx project easy-peasy.)
+
+With cljx installed as a plugin, all nREPL evaluations and `load-file`
+operations will be processed by cljx appropriately before they reach the Clojure
+or ClojureScript compiler.  Whether cljx code is processed for Clojure or
+ClojureScript is determined by the existence [or not] of a Piggieback
+ClojureScript environment in your current nREPL session's environment; this is
+entirely automatic.
 
 Currently, only cljx's default rulesets are used in this case (though you can
 work around this by making your own higher-order cljx nREPL middleware that uses
