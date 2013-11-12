@@ -1,4 +1,4 @@
-(defproject com.keminglabs/cljx "0.3.1"
+(defproject com.keminglabs/cljx "0.3.2-SNAPSHOT"
   :description "Static Clojure code rewriting"
   :url "http://github.com/lynaghk/cljx"
   :license {:name "BSD"
@@ -17,11 +17,11 @@
                    :output-path "target/test-output"
                    :rules :cljs}]}
 
-  :profiles {:dev {
-                   ; self-reference and chained `lein install; lein test` invocation
-                   ; needed to use the project as its own plugin. Leiningen :-(
-                   :plugins [[com.keminglabs/cljx "0.3.1"]]}
-             :self-plugin [:default {:plugins [[com.cemerick/clojurescript.test "0.2.0-SNAPSHOT"]]}]}
+  :profiles {
+             ; self-reference and chained `lein install; lein test` invocation
+             ; needed to use the project as its own plugin. Leiningen :-(
+             :self-plugin [:default {:plugins [[com.keminglabs/cljx "0.3.2-SNAPSHOT"]
+                                               [com.cemerick/clojurescript.test "0.2.1"]]}]}
   
   :aliases {"cleantest" ["with-profile" "self-plugin" "do" "clean," "cljx" "once," "test"]}
 
