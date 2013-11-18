@@ -47,6 +47,17 @@ fundamentally portable between Clojure and ClojureScript into one annotated
 compilation target in their "native" language (e.g. macros should always be in
 Clojure sources, DOM manipulation stuffs always in ClojureScript sources, etc).
 
+Does this seem crazy?  Crazy awesome, maybe.  Here's some real-world examples
+of projects that use cljx:
+
+* @Prismatic's [schema](https://github.com/Prismatic/schema)
+* [formative](https://github.com/jkk/formative)
+* [pprng](https://github.com/cemerick/pprng/)
+* [data.generators](https://github.com/cemerick/data.generators)
+
+(msg @cemerick if you have a project that does likewise that you'd like to have
+added to the list)
+
 ## "Installation"
 
 To use it, add to your `project.clj`:
@@ -166,19 +177,6 @@ valid TODOs:
 
 * Exclusionary annotations, e.g. `#-cljs`
 * "Union" annotations, e.g. `#+(or clj clr)`
-
-### Examples
-
-Some real-world examples of projects that use cljx:
-
-* [formative](https://github.com/jkk/formative)
-* [pprng](https://github.com/cemerick/pprng/)
-* [data.generators](https://github.com/cemerick/data.generators)
-
-<!-- TODO wait if/when C2 moves to new annotation approach
-* [C2](https://github.com/lynaghk/c2)
--->
-
 
 ### Clojure is a hosted language, in all flavours
 
