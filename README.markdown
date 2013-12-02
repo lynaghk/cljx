@@ -72,9 +72,7 @@ To use it, add to your `project.clj`:
                  :output-path "target/generated/cljs"
                  :rules :cljs}]}
 ```
-To automatically run cljx before starting a REPL, cutting a jar, etc., add its
-
-hook:
+To automatically run cljx before starting a REPL, cutting a jar, etc., add its hook:
 
 ```clojure
 :hooks [cljx.hooks]
@@ -101,7 +99,7 @@ be configured with the following options:
   project's `:source-paths` (by default, `"src"`) is not recommended; doing so
   will likely lead to them being included in e.g. jar files created by
   Leiningen.  Better to keep them separate, and use cljx to direct Clojure and
-  CLojureScript sources whereever they will be picked up by other tooling.
+  ClojureScript sources whereever they will be picked up by other tooling.
 * `:output-path`, the root directory where cljx's output will land.  Common
   options are `"target/classes"` for both Clojure and ClojureScript files you
   plan on distributing as a library; or, in an application project using
@@ -112,17 +110,17 @@ be configured with the following options:
   `"target/generated/cljs"`) that can be a source path in your lein-cljsbuild
   configuration(s).
 * `:rules` can be one of:
- * `:clj` or `:cljs` to use cljx's default Clojure or ClojureScript ruleset
-   (`cljx.rules/clj-rules` and `cljx.rules/cljs-rules`, respectively)
- * a map that specifies the three slots that make up a cljx ruleset:
-  * `:filetype`, a string that defines what the extension of output filenames
-    will be, e.g. `"cljs"`
-  * `:features`, a _set_ of strings, each naming an enabled "feature"; code in
-    `.cljx` files that is annotated with a feature that is not included in this
-    set will be pruned in the output
-  * `:transforms`, a sequence of functions that are applied to each expression
-    in each input file, and can modify that expression without constraint
- * a fully-qualified symbol that names a var containing a map as described above
+    * `:clj` or `:cljs` to use cljx's default Clojure or ClojureScript ruleset
+      (`cljx.rules/clj-rules` and `cljx.rules/cljs-rules`, respectively)
+    * a map that specifies the three slots that make up a cljx ruleset:
+        * `:filetype`, a string that defines what the extension of output filenames
+          will be, e.g. `"cljs"`
+        * `:features`, a _set_ of strings, each naming an enabled "feature"; code in
+          `.cljx` files that is annotated with a feature that is not included in this
+          set will be pruned in the output
+        * `:transforms`, a sequence of functions that are applied to each expression
+          in each input file, and can modify that expression without constraint
+    * a fully-qualified symbol that names a var containing a map as described above
 
 In general, you'll never need to go beyond the named cljx-provided rules.
 
