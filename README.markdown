@@ -88,8 +88,14 @@ significantly for the better :-P].)
 
 ## Usage
 
-Cljx can be run `once` or `auto`; if the latter (e.g. `lein cljx auto`), it will
-watch all `source-paths` for changes to `.cljx` files.  `once` is the default.
+There are two ways in which the cljx transformation can be made: via a Leiningen
+task (necessary when you need the transformation result on disk for
+e.g. packaging into a jar for distribution), and/or via an nREPL middleware that
+makes using the Leiningen task unnecessary in REPL sessions. 
+
+Cljx's Leiningen task can be run `once` or `auto`; if the latter (e.g. `lein
+cljx auto`), it will watch all `source-paths` for changes to `.cljx` files.
+`once` is the default.
 
 Each build (i.e. maps in the `:builds` vector in the `:cljx` configuration) can
 be configured with the following options:

@@ -1,5 +1,13 @@
 # changelog
 
+## 0.3.2
+
+* The cljx nREPL middleware has been enhanced to make running `lein cljx once`
+  unnecessary when running a _Clojure_ REPL.  This means that e.g. `(require
+  'ns.written.in.cljx)` will work, even if no corresponding `.clj` file has been
+  generated yet. (Analogous support for on-the-fly cljx transformations for
+  _ClojureScript_ is coming.)  (gh-24)
+
 ## 0.3.1
 
 * cljx now includes a small bit of Leiningen middleware that will automatically
