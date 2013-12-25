@@ -63,7 +63,7 @@ added to the list)
 To use it, add to your `project.clj`:
 
 ```clojure
-:plugins [[com.keminglabs/cljx "0.3.1"]]
+:plugins [[com.keminglabs/cljx "0.3.2"]]
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path "target/generated/clj"
                  :rules :clj}
