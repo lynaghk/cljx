@@ -47,7 +47,11 @@ fundamentally portable between Clojure and ClojureScript into one annotated
 compilation target in their "native" language (e.g. macros should always be in
 Clojure sources, DOM manipulation stuffs always in ClojureScript sources, etc).
 
-Does this seem crazy?  Crazy awesome, maybe.  Here's some real-world examples
+Does this seem crazy?  Crazy awesome, maybe.
+
+### Projects that use cljx
+
+Here's some real-world examples
 of projects that use cljx (when you feel in trouble, refer to these for usage
 and configuration examples):
 
