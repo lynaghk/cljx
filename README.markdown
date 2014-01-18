@@ -7,7 +7,7 @@
     |  $$$$$$$ | $$   | $$   /$$/\  $$
      \_______/ |__/   | $$  |__/  \__/
                  /$$  | $$          
-                |  $$$$$$/  Your code is, like, data, bro.        
+                |  $$$$$$/        
                  \______/           
 
 
@@ -48,12 +48,16 @@ compilation target in their "native" language (e.g. macros should always be in
 Clojure sources, DOM manipulation stuffs always in ClojureScript sources, etc).
 
 Does this seem crazy?  Crazy awesome, maybe.  Here's some real-world examples
-of projects that use cljx:
+of projects that use cljx (when you feel in trouble, refer to these for usage
+and configuration examples):
 
 * @Prismatic's [schema](https://github.com/Prismatic/schema)
 * [formative](https://github.com/jkk/formative)
 * [pprng](https://github.com/cemerick/pprng/)
 * [double-check](https://github.com/cemerick/double-check)
+* [frak](https://github.com/noprompt/frak)
+* [cellular](https://github.com/nodename/cellular)
+* [enoki](https://github.com/harto/enoki)
 
 (msg @cemerick if you have a project that does likewise that you'd like to have
 added to the list)
