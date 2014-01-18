@@ -53,7 +53,7 @@ of projects that use cljx:
 * @Prismatic's [schema](https://github.com/Prismatic/schema)
 * [formative](https://github.com/jkk/formative)
 * [pprng](https://github.com/cemerick/pprng/)
-* [data.generators](https://github.com/cemerick/data.generators)
+* [double-check](https://github.com/cemerick/double-check)
 
 (msg @cemerick if you have a project that does likewise that you'd like to have
 added to the list)
