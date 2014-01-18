@@ -51,13 +51,17 @@ Does this seem crazy?  Crazy awesome, maybe.  Here's some real-world examples
 of projects that use cljx (when you feel in trouble, refer to these for usage
 and configuration examples):
 
-* @Prismatic's [schema](https://github.com/Prismatic/schema)
+* [schema](https://github.com/Prismatic/schema)
 * [formative](https://github.com/jkk/formative)
 * [pprng](https://github.com/cemerick/pprng/)
+* [sablano](https://github.com/r0man/sablono)
 * [double-check](https://github.com/cemerick/double-check)
+* [garden](https://github.com/noprompt/garden)
+* [validateur](https://github.com/michaelklishin/validateur)
 * [frak](https://github.com/noprompt/frak)
 * [cellular](https://github.com/nodename/cellular)
 * [enoki](https://github.com/harto/enoki)
+* [pathetic](https://github.com/davidsantiago/pathetic)
 
 (msg @cemerick if you have a project that does likewise that you'd like to have
 added to the list)
