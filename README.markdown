@@ -61,10 +61,12 @@ and configuration examples):
 * [sablano](https://github.com/r0man/sablono)
 * [double-check](https://github.com/cemerick/double-check)
 * [garden](https://github.com/noprompt/garden)
+* [hickory](https://github.com/davidsantiago/hickory)
 * [validateur](https://github.com/michaelklishin/validateur)
 * [frak](https://github.com/noprompt/frak)
 * [cellular](https://github.com/nodename/cellular)
 * [enoki](https://github.com/harto/enoki)
+* [inflections-clj](https://github.com/r0man/inflections-clj)
 * [pathetic](https://github.com/davidsantiago/pathetic)
 
 (msg @cemerick if you have a project that does likewise that you'd like to have
