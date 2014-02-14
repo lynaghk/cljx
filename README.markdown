@@ -79,11 +79,11 @@ To use it, add to your `project.clj`:
 ```clojure
 :plugins [[com.keminglabs/cljx "0.3.2"]]
 :cljx {:builds [{:source-paths ["src/cljx"]
-                 :output-path "target/generated/clj"
+                 :output-path "target/classes"
                  :rules :clj}
                   
                 {:source-paths ["src/cljx"]
-                 :output-path "target/generated/cljs"
+                 :output-path "target/classes"
                  :rules :cljs}]}
 ```
 To automatically run cljx before starting a REPL, cutting a jar, etc., add its hook:
@@ -91,6 +91,9 @@ To automatically run cljx before starting a REPL, cutting a jar, etc., add its h
 ```clojure
 :hooks [cljx.hooks]
 ```
+
+A more comprehensive configuration example can be found
+[here](https://github.com/lynaghk/cljx/blob/master/sample.project.clj).
 
 ## Changelog
 
