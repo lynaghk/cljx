@@ -196,6 +196,16 @@ valid TODOs:
 * Exclusionary annotations, e.g. `#-cljs`
 * "Union" annotations, e.g. `#+(or clj clr)`
 
+
+### Notes on using Cljx in libraries
+
+When including Cljx files in a library intended for use in other projects, in addition to the `:cljx` build-specific notes above, you will need to ensure you have the `:source-paths` setting properly set.  This will ensure that generated files are included in the jar properly:
+
+```clojure
+:source-paths ["src" "target/generated/clj" "target/generated/cljs"]
+```
+
+
 ### Clojure is a hosted language, in all flavours
 
 Cljx does *not* try to hide implementation differences between host platforms.
