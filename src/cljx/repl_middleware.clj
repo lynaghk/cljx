@@ -2,6 +2,8 @@
   (:require [cljx.core :as cljx]
             [cljx.rules :as rules]
             [cemerick.piggieback :as piggieback]
+            cljs.closure
+            [clojure.java.io :as io]
             [clojure.tools.nrepl.middleware :refer (set-descriptor!)]))
 
 (defn- find-resource
@@ -40,23 +42,47 @@ directory for the current namespace otherwise."
                 (when @#'clojure.core/*loading-verbosely*
                   (printf "Transforming cljx => clj from %s.cljx\n" base-resource-path))
                 (-> (slurp cljx)
-                    (cljx/transform @cljx-load-rules)
+                    (cljx/transform (:clj @cljx-load-rules))
                     java.io.StringReader.
                     (clojure.lang.Compiler/load base-resource-path
                                                 (last (re-find #"([^/]+$)" cljx-path)))))
               (clojure.lang.RT/load base-resource-path))))))))
 
-(def ^:private clojure-load nil)
+(def ^:private clojure-load load)
+(def ^:private clojure-resource io/resource)
 
-(def ^:private install-cljx-load (delay (alter-var-root #'clojure-load (constantly load))
-                                        (alter-var-root #'load (constantly cljx-load))))
+(defn cljx-cljs-resource
+  [& [^String resource-name :as resource-args]]
+  (or (apply clojure-resource resource-args)
+    (when-let [cljx (and (.endsWith resource-name ".cljs")
+                      (apply clojure-resource (cons (.replaceAll resource-name ".cljs$" ".cljx")
+                                                (rest resource-args))))]
+      (let [tmp-cljs (java.io.File/createTempFile "cljxtransform" ".cljs")]
+        (.deleteOnExit tmp-cljs)
+        (as-> (slurp cljx) %
+          (cljx/transform % (:cljs @cljx-load-rules))
+          (spit tmp-cljs %))
+        (.toURL tmp-cljs)))))
+
+
+(def ^:private install-cljx-load
+  (delay (alter-var-root #'load (constantly cljx-load))
+    ; ***HACK*** there's no smaller function that is responsible for loading
+    ; transitive cljs dependencies; we're hooking cljs-dependencies here so it
+    ; uses our wrapping of clojure.java.io/resource when attempting to find the
+    ; .cljs file corresponding to a required namespace
+    (alter-var-root #'cljs.closure/cljs-dependencies
+      (fn [cljs-dependencies]
+        (fn [& args]
+          (with-redefs [io/resource cljx-cljs-resource]
+            (apply cljs-dependencies args)))))))
 
 (defn wrap-cljx
   ([h] (wrap-cljx h {:clj rules/clj-rules :cljs rules/cljs-rules}))
   ([h {:keys [clj cljs] :as rules}]
      ; essentially changing the rules each time a new nREPL endpoint is set up...
      ; generally will only ever happen once per JVM process
-     (reset! cljx-load-rules clj)
+     (reset! cljx-load-rules rules)
      @install-cljx-load 
      (fn [{:keys [op code file file-name session] :as msg}]
        (let [rules (if (@session #'piggieback/*cljs-repl-env*)
