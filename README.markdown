@@ -1,32 +1,31 @@
-                /$$                
-               | $$                
+                /$$
+               | $$
       /$$$$$$$ | $$    /$$   /$$   /$$
      /$$_____/ | $$   |__/  |  $$ /$$/
-    | $$       | $$    /$$   \  $$$$/ 
-    | $$       | $$   | $$    >$$  $$ 
+    | $$       | $$    /$$   \  $$$$/
+    | $$       | $$   | $$    >$$  $$
     |  $$$$$$$ | $$   | $$   /$$/\  $$
      \_______/ |__/   | $$  |__/  \__/
-                 /$$  | $$          
-                |  $$$$$$/        
-                 \______/           
+                 /$$  | $$
+                |  $$$$$$/
+                 \______/
 
 
-Cljx is a [Leiningen](https://github.com/technomancy/leiningen) plugin that
-emits Clojure and ClojureScript code from a single annotated codebase.
-Effectively, it is an s-expression preprocessor:
+cljx is a [Leiningen](https://github.com/technomancy/leiningen) plugin and nREPL
+middleware that produces Clojure and ClojureScript code from a single annotated
+codebase.  Effectively, it is an s-expression preprocessor that yields either
+Clojure and ClojureScript sources on disk (e.g. for inclusion in jars or for
+input to compilation tools like Clojure AOT-compilation and lein-cljsbuild):
 
 ```
-             +-----------+
-             |           |
-             | .cljx     |
-             | sources   |
-             |           |
-             +-----+-----+
+             +---------+
+             | .cljx   |
+             | sources |
+             +-----+---+
                    |
                    |
                    |
              +-----v-----+       +----------------+
-             |           |       |                |
              | cljx      <-------+  configuration |
              | Leiningen |       |       +        |
              | plugin    |       |     rules      |
@@ -34,11 +33,36 @@ Effectively, it is an s-expression preprocessor:
                 |  |
                 |  |
  +------------+ |  | +------------+
- |            | |  | |            |
  |   .clj     <-+  +->   .cljs    |
  |   sources  |      |   sources  |
- |            |      |            |
  +------------+      +------------+
+```
+
+…or, when used in a REPL, cljx automatically applies the same transformation to
+any namespaces to be loaded (e.g. as a result of `:require` declarations) from
+`.cljx` files before they are consumed by the Clojure or ClojureScript compiler:
+
+```
+                          +------------+       +---------------+
+     +---------+          | cljx       |       | configuration |
+     | .cljx   |          | nREPL      |       |      +        |
+     | sources +----------> middleware <-------+    rules      |
+     +---------+          +-----+------+       +---------------+
+                                |
+                                |
+                                |
+                        +-------v---------+
+                        | `require`       |
+                        | `:require`      |
+      +---------+       | `load-namespace`|        +---------+
+      | .cljs   +-------> ...etc...       <--------+ .cljs   |
+      | sources |       +------+--+-------+        | sources |
+      +---------+              |  |                +---------+
+                               |  |
+                +------------+ |  | +---------------+
+                |  Clojure   <-+  +-> ClojureScript |
+                |  compiler  |      | compiler      |
+                +------------+      +---------------+
 ```
 
 When using cljx, you put APIs and implementations that are meant to be
@@ -69,9 +93,6 @@ and configuration examples):
 * [inflections-clj](https://github.com/r0man/inflections-clj)
 * [pathetic](https://github.com/davidsantiago/pathetic)
 
-(msg @cemerick if you have a project that does likewise that you'd like to have
-added to the list)
-
 ## "Installation"
 
 To use it, add to your `project.clj`:
@@ -81,11 +102,12 @@ To use it, add to your `project.clj`:
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path "target/classes"
                  :rules :clj}
-                  
+
                 {:source-paths ["src/cljx"]
                  :output-path "target/classes"
                  :rules :cljs}]}
 ```
+
 To automatically run cljx before starting a REPL, cutting a jar, etc., add its hook:
 
 ```clojure
@@ -100,7 +122,7 @@ A more comprehensive configuration example can be found
 See `CHANGES.md` at the root of this repo.
 
 (You'll especially want to look at the entry for `0.3.0` if you've been using
-previous versions of cljx, as things have changed [of course, we think
+older versions of cljx, as things have changed [of course, we think
 significantly for the better :-P].)
 
 ## Usage
@@ -108,9 +130,9 @@ significantly for the better :-P].)
 There are two ways in which the cljx transformation can be made: via a Leiningen
 task (necessary when you need the transformation result on disk for
 e.g. packaging into a jar for distribution), and/or via an nREPL middleware that
-makes using the Leiningen task unnecessary in REPL sessions. 
+makes using the Leiningen task unnecessary in REPL sessions.
 
-Cljx's Leiningen task can be run `once` or `auto`; if the latter (e.g. `lein
+cljx's Leiningen task can be run `once` or `auto`; if the latter (e.g. `lein
 cljx auto`), it will watch all `source-paths` for changes to `.cljx` files.
 `once` is the default.
 
@@ -178,7 +200,7 @@ E.g., the `.cljx` source containing
     (.append buf (str x))))
 
 (reify
-                       
+
          cljs.core.IFn
   (invoke [_ x] (inc x)))
 ```
@@ -192,7 +214,7 @@ debuggers, source maps, etc) will remain true to the original sources.
 The `#+feature-name` "annotation" syntax is shamelessly stolen from [Common
 Lisp](http://www.lispworks.com/documentation/lw50/CLHS/Body/02_dhq.htm) (and is
 perhaps being considered for inclusion in Clojure[Script] itself?...see [feature
-expressions](http://dev.clojure.org/display/design/Feature+Expressions)).  Cljx
+expressions](http://dev.clojure.org/display/design/Feature+Expressions)).  cljx
 only supports the simplest form of the syntax; other forms can be considered
 valid TODOs:
 
@@ -201,12 +223,12 @@ valid TODOs:
 
 ### Clojure is a hosted language, in all flavours
 
-Cljx does *not* try to hide implementation differences between host platforms.
+cljx does *not* try to hide implementation differences between host platforms.
 Clojure has ints, floats, longs, &c., ClojureScript has number; Clojure regular
 expressions act differently than ClojureScript regular expressions, because
-*they are different*.
+*they are different*, and so on.
 
-Cljx only tries to unify Clojure/ClojureScript abstractions when it makes sense.
+cljx only tries to unify Clojure/ClojureScript abstractions when it makes sense.
 E.g., converting `clojure.lang.IFn` into `IFn` when generating ClojureScript.
 The rest is up to you, in annotating your code to include or exclude what's
 needed by each runtime.
@@ -217,20 +239,20 @@ Macroexpansion occurs long after cljx touches your code.
 
 ### REPL Integration
 
-Cljx provides an nREPL middleware that allows you to work with `.cljx` files in
+cljx provides an nREPL middleware that allows you to work with `.cljx` files in
 the same way you work with regular `.clj` files from any toolchain with good
-nREPL support, like [nrepl.el](https://github.com/kingtim/nrepl.el),
+nREPL support, like [cider](https://github.com/clojure-emacs/cider),
 [Counterclockwise](http://code.google.com/p/counterclockwise/), etc.
 
 When you add cljx as a `:plugin` to your Leiningen project:
 
 1. The cljx and [Piggieback](https://github.com/cemerick/piggieback) nREPL
   middlewares will automatically be added to your `:repl-options`
-2. Cljx itself will be added as a project dependency (this will only affect REPL
+2. cljx itself will be added as a project dependency (this will only affect REPL
   processes, and won't leak out into your project's `pom.xml`, influencing
   downstream users of your library, if you're writing one)
 
-(Note that this does not conflict with using the 
+(Note that this does not conflict with using the
 [Austin](http://github.com/cemerick/austin) plugin to automate the configuration
 of your project to use Piggieback.  In fact, the pairing is highly recommended
 for making the ClojureScript REPL side of your cljx project easy-peasy.)
@@ -272,5 +294,3 @@ Get the same syntax highlighting of `.cljx` files as you currently do for `.clj`
 * @cemerick for design chats, maintaining and extending cljx, and rewriting the core to use sjacket
 * @cgrand and @trptcolin for [sjacket](https://github.com/cgrand/sjacket)
 * @swannodette for [core.match](https://github.com/clojure/core.match)
-
-
