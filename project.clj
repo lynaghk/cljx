@@ -6,8 +6,8 @@
 
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/core.match "0.2.0"]
-                 [org.clojars.trptcolin/sjacket "0.1.0.3"]
-                 [com.cemerick/piggieback "0.1.0"]
+                 [org.clojars.trptcolin/sjacket "0.1.0.6"]
+                 [com.cemerick/piggieback "0.1.3"]
                  [watchtower "0.1.1"]]
 
   :cljx {:builds [{:source-paths ["test"]
@@ -20,8 +20,8 @@
   :profiles {
              ; self-reference and chained `lein install; lein test` invocation
              ; needed to use the project as its own plugin. Leiningen :-(
-             :self-plugin [:default {:plugins [[com.keminglabs/cljx "0.3.2-SNAPSHOT"]
-                                               [com.cemerick/clojurescript.test "0.2.1"]]}]}
+             :self-plugin [:default {:plugins [[com.keminglabs/cljx "0.4.0-SNAPSHOT"]
+                                               [com.cemerick/clojurescript.test "0.3.1"]]}]}
   
   :aliases {"cleantest" ["with-profile" "self-plugin" "do" "clean," "cljx" "once," "test"]}
 
