@@ -1,5 +1,15 @@
 # changelog
 
+## 0.4.0
+
+* The cljx nREPL middleware has been enhanced to make running `lein cljx once`
+  unnecessary when running a _ClojureScript_ REPL. This means that
+  e.g. `(load-namespace 'ns.written.in.cljx)` or `(ns foo (:require
+  ns.written.in.cljx))` will work, even if no corresponding `.cljs` file has
+  been generated yet. (gh-24)
+* Updated the piggieback dependency to align with its range of compatibility
+  with the ClojureScript compiler API (gh-40)
+
 ## 0.3.2
 
 * The cljx nREPL middleware has been enhanced to make running `lein cljx once`
