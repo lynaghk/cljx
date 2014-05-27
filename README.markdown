@@ -98,7 +98,7 @@ and configuration examples):
 To use it, add to your `project.clj`:
 
 ```clojure
-:plugins [[com.keminglabs/cljx "0.3.2"]]
+:plugins [[com.keminglabs/cljx "0.4.0"]]
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path "target/classes"
                  :rules :clj}
