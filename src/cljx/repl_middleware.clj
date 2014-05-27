@@ -67,10 +67,10 @@ directory for the current namespace otherwise."
 
 (def ^:private install-cljx-load
   (delay (alter-var-root #'load (constantly cljx-load))
-    ; ***HACK*** there's no smaller function that is responsible for loading
-    ; transitive cljs dependencies; we're hooking cljs-dependencies here so it
-    ; uses our wrapping of clojure.java.io/resource when attempting to find the
-    ; .cljs file corresponding to a required namespace
+    ; I originally thought that this was a hack, and that replacing
+    ; `cljs.closure/cljs-source-for-namespace` was going to be a much cleaner
+    ; solution, but that puts the reference to a temp file within view of the
+    ; CLJS compiler, as *cljs-file*; this makes compiler warnings _useless_.
     (alter-var-root #'cljs.closure/cljs-dependencies
       (fn [cljs-dependencies]
         (fn [& args]
