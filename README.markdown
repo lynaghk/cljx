@@ -92,6 +92,7 @@ and configuration examples):
 * [enoki](https://github.com/harto/enoki)
 * [inflections-clj](https://github.com/r0man/inflections-clj)
 * [pathetic](https://github.com/davidsantiago/pathetic)
+* [cats](https://github.com/niwibe/cats)
 
 ## "Installation"
 
