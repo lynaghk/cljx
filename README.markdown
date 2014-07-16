@@ -277,7 +277,7 @@ Get the same syntax highlighting of `.cljx` files as you currently do for `.clj`
 
 ##### Emacs
 
-`(add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))`
+`clojure-mode` supports `.cljx` source files out-of-the-box. It will even font-lock features properly.
 
 ##### Vim
 
