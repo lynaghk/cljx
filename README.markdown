@@ -96,10 +96,10 @@ and configuration examples):
 
 ## "Installation"
 
-To use it, add to your `project.clj`:
+To use it, add to the `:dev` profile in your `project.clj`:
 
 ```clojure
-:plugins [[com.keminglabs/cljx "0.4.0"]]
+:profiles {:dev {:plugins [[com.keminglabs/cljx "0.4.0"]]}}
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path "target/classes"
                  :rules :clj}
@@ -250,7 +250,8 @@ When you add cljx as a `:plugin` to your Leiningen project:
 1. The cljx and [Piggieback](https://github.com/cemerick/piggieback) nREPL
   middlewares will automatically be added to your `:repl-options`
 2. cljx itself will be added as a project dependency (this will only affect REPL
-  processes, and won't leak out into your project's `pom.xml`, influencing
+  processes, and won't leak out into your project's `pom.xml`
+  (_as long as you add cljx to your `:dev` profile_), influencing
   downstream users of your library, if you're writing one)
 
 (Note that this does not conflict with using the
