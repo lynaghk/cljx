@@ -13,8 +13,10 @@
              cljx-version))
 
 (def profiles
-  {:cljx/inject
-   {:dependencies [['com.keminglabs/cljx cljx-version :scope "test"]]
+  {:cljx-inject
+   {:dependencies [['com.keminglabs/cljx cljx-version
+                    ;; pom task is broken otherwise in lein 2.4.3 and earlier
+                    :scope "test"]]
     :repl-options
     {:nrepl-middleware
      '[cljx.repl-middleware/wrap-cljx cemerick.piggieback/wrap-cljs-repl]}}})
@@ -30,7 +32,10 @@
     (-> project
         (vary-meta assoc ::middleware-applied true)
         (add-profiles profiles)
-        (add-to-default-profile [:cljx/inject])
-        (set-profiles
-         (into (-> project meta :included-profiles distinct) [:cljx/inject]))
+        (add-to-default-profile [:cljx-inject])
+        (cond->
+         (not (some #{:cljx-inject} (-> project meta :excluded-profiles)))
+         (set-profiles
+          (distinct
+           (into (-> project meta :included-profiles distinct) [:cljx-inject]))))
         (vary-meta dissoc ::middleware-applied))))
