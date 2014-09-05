@@ -99,7 +99,7 @@ and configuration examples):
 To use it, add to the `:dev` profile in your `project.clj`:
 
 ```clojure
-:profiles {:dev {:plugins [[com.keminglabs/cljx "0.4.0"]]}}
+:profiles {:dev {:plugins [[com.keminglabs/cljx "0.5.0-SNAPSHOT"]]}}
 :cljx {:builds [{:source-paths ["src/cljx"]
                  :output-path "target/classes"
                  :rules :clj}
