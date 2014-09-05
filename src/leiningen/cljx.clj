@@ -1,5 +1,6 @@
 (ns leiningen.cljx
-  (:require [leiningen.core.eval :refer (eval-in-project)]
+  (:require cljx.plugin
+            [leiningen.core.eval :refer (eval-in-project)]
             [leiningen.core.project :as project]))
 
 (def no-opts-warning "You need a :cljx entry in your project.clj! See the cljx docs for more info.")
@@ -13,16 +14,17 @@ This variant of eval-in-project implicitly adds the current :plugin dep on
 cljx to the main :dependencies vector of the project, as well as specifying
 that the eval should happen in-process in a new classloader (faster!)."
   [project init form]
-  (let [cljx-plugin (filter (comp #{'com.keminglabs/cljx 'org.clojars.cemerick/cljx} first)
-                            (:plugins project))]
-    (eval-in-project
-      (-> project
-        (project/merge-profiles [{:dependencies cljx-plugin}])
-        ; don't AOT any Clojure, as cljx will likely generate some .clj files
-        ; that will be needed to make sure that succeeds
-        (assoc :prep-tasks ["javac"]))
-      form
-      init)))
+  (eval-in-project
+    (-> project
+      (project/merge-profiles [{:dependencies [cljx.plugin/cljx-coordinates]}])
+      ; If the user has configured cljx to be run using :prep-tasks, this removes its
+      ; entry so eip doesn't try to circularly invoke cljx again.
+      (update-in [:prep-tasks]
+        (partial remove #(or (= "cljx" (str %))
+                           (and (sequential? %)
+                             (= "cljx" (str (first %))))))))
+    form
+    init))
 
 (defn- once
   "Transform .cljx files once and then exit."

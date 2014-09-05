@@ -109,12 +109,6 @@ To use it, add to the `:dev` profile in your `project.clj`:
                  :rules :cljs}]}
 ```
 
-To automatically run cljx before starting a REPL, cutting a jar, etc., add its hook:
-
-```clojure
-:hooks [cljx.hooks]
-```
-
 A more comprehensive configuration example can be found
 [here](https://github.com/lynaghk/cljx/blob/master/sample.project.clj).
 
