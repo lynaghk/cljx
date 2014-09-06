@@ -118,6 +118,29 @@ To automatically run cljx before starting a REPL, cutting a jar, etc., add its h
 A more comprehensive configuration example can be found
 [here](https://github.com/lynaghk/cljx/blob/master/sample.project.clj).
 
+With leiningen 2.4.4, you can also use profiles injected by the cljx plugin.
+
+To use the profiles, add them to your `project.clj`:
+
+```clj
+:profiles {:downstream [:plugins.cljx/mixed-source]
+           :dev [:plugins.cljx/mixed-test]}
+```
+
+The profiles provided are:
+
+`mixed-source`
+: transforms cljx files in `src/cljx` to `target/generated/src/clj[s]`
+
+`mixed-test`
+: transforms cljx files in `test/cljx` to `target/generated/test/clj[s]`
+
+`cljx-only-source`
+: transforms cljx files in `src` to `target/generated/src/clj[s]`
+
+`cljx-only-test`
+: transforms cljx files in `test` to `target/generated/test/clj[s]`
+
 ## Changelog
 
 See `CHANGES.md` at the root of this repo.
