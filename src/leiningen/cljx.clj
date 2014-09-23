@@ -49,7 +49,6 @@ that the eval should happen in-process in a new classloader (faster!)."
                (wt/file-filter (wt/extensions :cljx))
                (wt/rate 1000)
                (wt/on-change (fn [files#] 
-                               (println "Builds " '~builds)
                                (#'cljx.core/cljx-compile '~builds :files files#)))
                (wt/watch))))))
 
