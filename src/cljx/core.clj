@@ -56,32 +56,36 @@ Returns a sequence of File objects, in breadth-first sort order."
   (.getAbsolutePath (io/file output-dir (str (relativize source source-path)))))
 
 (defn generate
-  [{:keys [source-path output-path rules] :as options}]
-  (println "Rewriting" source-path "to" output-path
-           (str "(" (:filetype rules) ")")
-           "with features" (:features rules) "and"
-           (count (:transforms rules)) "transformations.")
-  (doseq [f (find-cljx-sources-in-dir source-path)
-          :let [result (transform (slurp f) rules)
-                destination (str/replace (destination-path f source-path output-path)
-                                         #"\.[^\.]+$" (str "." (:filetype rules)))]]
-    (doto destination
-      io/make-parents
-      (spit (with-out-str
-              (println result)
-              (print warning-str)
-              (println (.getPath f)))))))
+  ([options]
+   (generate options (find-cljx-sources-in-dir (:source-path options))))
+  ([{:keys [source-path output-path rules] :as options} files]
+   (println "Rewriting" source-path "to" output-path
+            (str "(" (:filetype rules) ")")
+            "with features" (:features rules) "and"
+            (count (:transforms rules)) "transformations.")
+   (doseq [f files 
+           :let [result (transform (slurp f) rules)
+                 destination (str/replace (destination-path f source-path output-path)
+                                          #"\.[^\.]+$" (str "." (:filetype rules)))]]
+     (doto destination
+       io/make-parents
+       (spit (with-out-str
+               (println result)
+               (print warning-str)
+               (println (.getPath f))))))))
 
-(defn cljx-compile [builds]
-  "The actual static transform, separated out so it can be called repeatedly."
-  (doseq [{:keys [source-paths output-path rules] :as build} builds]
-    (let [rules (cond
-                  (= :clj rules) rules/clj-rules
-                  (= :cljs rules) rules/cljs-rules
-                  (symbol? rules) (do
-                    (require (symbol (namespace rules)))
-                    @(resolve rules))
-                  :default (eval rules))]
-      (doseq [p source-paths]
-        (generate (assoc build :rules rules :source-path p))))))
-
+(defn cljx-compile 
+  ([builds & {:keys [files]}]
+   "The actual static transform, separated out so it can be called repeatedly."
+   (doseq [{:keys [source-paths output-path rules] :as build} builds]
+     (let [rules (cond
+                   (= :clj rules) rules/clj-rules
+                   (= :cljs rules) rules/cljs-rules
+                   (symbol? rules) (do
+                                     (require (symbol (namespace rules)))
+                                     @(resolve rules))
+                   :default (eval rules))]
+       (doseq [p source-paths]
+         (if files
+           (generate (assoc build :rules rules :source-path p) files) 
+           (generate (assoc build :rules rules :source-path p))))))))
