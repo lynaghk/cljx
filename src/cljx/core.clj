@@ -72,7 +72,7 @@ Returns a sequence of File objects, in breadth-first sort order."
               (print warning-str)
               (println (.getPath f)))))))
 
-(defn- add-profile-to-rules [rules project]
+(defn add-profile-to-rules [rules project]
   "Add the profiles active in the given project to the given ruleset."
   (assoc rules :features
          (into (:features rules)
