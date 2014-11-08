@@ -24,6 +24,9 @@
 
 (comment foo)
 
+; make sure that profiles work
+              [2 4 5]
+
 ; making sure other tagged literals are left untouched
 #whatever [1 2 3]
 
