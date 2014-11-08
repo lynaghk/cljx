@@ -30,7 +30,7 @@ that the eval should happen in-process in a new classloader (faster!)."
   (cljx-eip project
     '(require 'cljx.core)
     `(do
-       (#'cljx.core/cljx-compile '~builds)
+       (#'cljx.core/cljx-compile '~builds '~project)
        ; if users have :injections that start any agents, *and* we're in our own
        ; process, we need to shut them down so that e.g. `lein cljx once`
        ; doesn't take 60s
@@ -48,7 +48,7 @@ that the eval should happen in-process in a new classloader (faster!)."
              (-> (wt/watcher* ~dirs)
                (wt/file-filter (wt/extensions :cljx))
                (wt/rate 1000)
-               (wt/on-change (fn [_#] (#'cljx.core/cljx-compile '~builds)))
+               (wt/on-change (fn [_#] (#'cljx.core/cljx-compile '~builds '~project)))
                (wt/watch))))))
 
 (defn cljx
