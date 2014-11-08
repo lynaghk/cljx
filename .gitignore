@@ -1,5 +1,8 @@
 lib/
+.idea*
 .lein*
+.nrepl-port
+*.iml
 test/generated
 pom.xml
 target/
