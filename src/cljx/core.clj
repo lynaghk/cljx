@@ -72,16 +72,25 @@ Returns a sequence of File objects, in breadth-first sort order."
               (print warning-str)
               (println (.getPath f)))))))
 
-(defn cljx-compile [builds]
+(defn add-profile-to-rules [rules project]
+  "Add the profiles active in the given project to the given ruleset."
+  (assoc rules :features
+         (into (:features rules)
+               (map name (keys (:profiles project))))))
+
+(defn cljx-compile [builds project]
   "The actual static transform, separated out so it can be called repeatedly."
   (doseq [{:keys [source-paths output-path rules] :as build} builds]
-    (let [rules (cond
-                  (= :clj rules) rules/clj-rules
-                  (= :cljs rules) rules/cljs-rules
-                  (symbol? rules) (do
-                    (require (symbol (namespace rules)))
-                    @(resolve rules))
-                  :default (eval rules))]
+    (let [rules (add-profile-to-rules
+                  (cond
+                    (= :clj rules) rules/clj-rules
+                    (= :cljs rules) rules/cljs-rules
+                    (symbol? rules) (do
+                                      (require (symbol (namespace rules)))
+                                      @(resolve rules))
+                    :default (eval rules))
+                  project
+                  )]
       (doseq [p source-paths]
         (generate (assoc build :rules rules :source-path p))))))
 

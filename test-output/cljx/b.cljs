@@ -8,6 +8,9 @@
       
 (defn cljs-only [x] "Internets time")
 
+             
+(defn both [x] "yay")
+
 (defn x
   [y]
   (               - y y))

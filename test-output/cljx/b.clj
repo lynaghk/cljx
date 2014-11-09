@@ -8,6 +8,9 @@
       
                                      
 
+             
+(defn both [x] "yay")
+
 (defn x
   [y]
   (      +          y y))
