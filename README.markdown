@@ -118,6 +118,12 @@ To automatically run cljx before starting a REPL, cutting a jar, etc., add its h
 A more comprehensive configuration example can be found
 [here](https://github.com/lynaghk/cljx/blob/master/sample.project.clj).
 
+Starting with leiningen `2.4.2` it is recommended not to use hooks but the `prep-tasks` element:
+
+```clojure
+:prep-tasks "cljx once"
+```
+
 ## Changelog
 
 See `CHANGES.md` at the root of this repo.
