@@ -50,7 +50,8 @@ that the eval should happen in-process in a new classloader (faster!)."
              (-> (wt/watcher* ~dirs)
                (wt/file-filter (wt/extensions :cljx))
                (wt/rate 1000)
-               (wt/on-change (fn [_#] (#'cljx.core/cljx-compile '~builds)))
+               (wt/on-change (fn [files#] 
+                               (#'cljx.core/cljx-compile '~builds :files files#)))
                (wt/watch))))))
 
 (defn cljx
