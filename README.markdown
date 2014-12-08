@@ -112,10 +112,12 @@ To use it, add to the `:dev` profile in your `project.clj`:
 A more comprehensive configuration example can be found
 [here](https://github.com/lynaghk/cljx/blob/master/sample.project.clj).
 
-Starting with leiningen `2.4.2` it is recommended not to use hooks but the `prep-tasks` element:
+If you want cljx to be invoked automatically as part of the Leiningen
+compilation process (e.g. before testing, or cutting a jar), add cljx to your
+`:prep-tasks` vector in `project.clj`:
 
 ```clojure
-:prep-tasks "cljx once"
+:prep-tasks [["cljx" "once"]]
 ```
 
 ## Changelog
