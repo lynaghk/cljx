@@ -1,5 +1,14 @@
 # changelog
 
+## 0.5.0
+
+* cljx hooks have been eliminated (their use only emits a warning now), due to
+  [upstream changes in Leiningen](https://github.com/lynaghk/cljx/issues/51)
+  (gh-51, gh-49, gh-22)
+* cljx now depends upon a canonical release of sjacket, which eliminates various
+  dependency resolution warnings
+* `cljx auto` will now only reprocess files that have changed (gh-53)
+
 ## 0.4.0
 
 * The cljx nREPL middleware has been enhanced to make running `lein cljx once`
