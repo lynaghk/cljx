@@ -1,6 +1,6 @@
 # changelog
 
-## 0.5.0
+## [0.5.0](https://github.com/lynaghk/cljx/issues?q=milestone%3A0.5.0)
 
 * cljx hooks have been eliminated (their use only emits a warning now), due to
   [upstream changes in Leiningen](https://github.com/lynaghk/cljx/issues/51)
