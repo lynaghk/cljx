@@ -23,7 +23,9 @@
   :source-paths ["src/cljx"]
   :test-paths ["target/test-classes"]
   :dependencies [[org.clojure/clojure "1.6.0-alpha1"]]
-
+  ;; needs disabling for Cljx. See
+  ;; https://github.com/technomancy/leiningen/blob/master/sample.project.clj#L389-392.
+  :auto-clean false
   :cljx {:builds [{:source-paths ["src/cljx"]
                    :output-path "target/classes"
                    :rules :clj}
