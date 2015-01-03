@@ -53,15 +53,27 @@
   "Get relative path of filepath in respect
   of rootpath."
   [filepath rootpath]
-  (let [file-uri (.toURI (io/file filepath))
-        dest-uri (.toURI (io/file rootpath))]
-    (.getPath (.relativize dest-uri file-uri))))
+  (let [file-path (.toPath (io/file filepath))
+        dest-path (.toPath (io/file rootpath))]
+    (str (.relativize dest-path file-path))))
 
 (defn- destination-path
   [source source-path output-dir]
   (let [^String destpath (relativize source source-path)  ; Calculate relative path.
         ^URI destfile (io/file output-dir destpath)]      ; Create a dest file instance
     (.getAbsolutePath destfile)))
+
+(defn- filter-files-for-path
+  "Filter a bunch of files that matches the
+  provided path."
+  [files sourcepath]
+  (let [sourcepath (-> (io/file sourcepath)
+                       (.toPath)
+                       (.toAbsolutePath))]
+    (filter (fn [f]
+              (let [fpath (.toAbsolutePath (.toPath f))]
+                (.startsWith fpath sourcepath)))
+            files)))
 
 (defn generate
   "Generate source files from cljx files."
@@ -71,7 +83,7 @@
             (str "(" (:filetype rules) ")")
             "with features" (:features rules) "and"
             (count (:transforms rules)) "transformations.")
-   (doseq [f files]
+   (doseq [f (filter-files-for-path files source-path)]
      (let [destpath (-> (destination-path f source-path output-path)
                         (str/replace #"\.[^\.]+$" (str "." (:filetype rules))))]
        ;; Create all directories if need
@@ -87,7 +99,7 @@
 
 (defn cljx-compile
    "The actual static transform, separated out so it can be called repeatedly."
-   [builds & {:keys [files]}]
+   [builds & [files]]
    (doseq [{:keys [source-paths output-path rules] :as build} builds]
      (let [rules (cond
                    (= :clj rules) rules/clj-rules
