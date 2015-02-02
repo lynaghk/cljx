@@ -43,16 +43,16 @@ that the eval should happen in-process in a new classloader (faster!)."
   "Watch .cljx files and transform them after any changes."
   [project builds]
   (cljx-eip project
-       '(require 'cljx.core '[watchtower.core :as wt])
-       (let [dirs (set (flatten (map :source-paths builds)))]
-          `(do
-             (println "Watching" (vec ~dirs) "for changes.")
-             (-> (wt/watcher* ~dirs)
-               (wt/file-filter (wt/extensions :cljx))
-               (wt/rate 1000)
-               (wt/on-change (fn [files#] 
-                               (#'cljx.core/cljx-compile '~builds :files files#)))
-               (wt/watch))))))
+            '(require 'cljx.core '[watchtower.core :as wt])
+            (let [dirs (set (flatten (map :source-paths builds)))]
+              `(do
+                 (println "Watching" (vec ~dirs) "for changes.")
+                 (-> (wt/watcher* ~dirs)
+                     (wt/file-filter (wt/extensions :cljx))
+                     (wt/rate 1000)
+                     (wt/on-change (fn [files#]
+                                     (#'cljx.core/cljx-compile '~builds files#)))
+                     (wt/watch))))))
 
 (defn cljx
   "Statically transform .cljx files into Clojure and ClojureScript sources."
