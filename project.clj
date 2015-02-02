@@ -1,4 +1,4 @@
-(defproject com.keminglabs/cljx "0.5.0"
+(defproject com.keminglabs/cljx "0.5.1-SNAPSHOT"
   :description "Static Clojure code rewriting"
   :url "http://github.com/lynaghk/cljx"
   :license {:name "BSD"
@@ -7,7 +7,7 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/core.match "0.2.0"]
                  [net.cgrand/sjacket "0.1.1" :exclusions [org.clojure/clojure]]
-                 [com.cemerick/piggieback "0.1.3"]
+                 [com.cemerick/piggieback "0.1.5"]
                  [watchtower "0.1.1"]]
 
   :cljx {:builds [{:source-paths ["test"]
