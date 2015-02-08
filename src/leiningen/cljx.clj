@@ -45,14 +45,21 @@ that the eval should happen in-process in a new classloader (faster!)."
   (cljx-eip project
        '(require 'cljx.core '[watchtower.core :as wt])
        (let [dirs (set (flatten (map :source-paths builds)))]
-          `(do
-             (println "Watching" (vec ~dirs) "for changes.")
-             (-> (wt/watcher* ~dirs)
-               (wt/file-filter (wt/extensions :cljx))
-               (wt/rate 1000)
-               (wt/on-change (fn [files#] 
-                               (#'cljx.core/cljx-compile '~builds :files files#)))
-               (wt/watch))))))
+         `(do
+            (println "Watching" (vec ~dirs) "for changes.")
+            (-> (wt/watcher* ~dirs)
+                (wt/file-filter (wt/extensions :cljx))
+                (wt/rate 1000)
+                (wt/on-change (fn [files#]
+                                ;; NOTE: no fles used because it much simple
+                                ;; scan appropiate directories for files instead
+                                ;; handle a bunch of files that not always matches
+                                ;; one unique rule.
+                                ;; Better approach maybe is filtering files
+                                ;; for each build and execute cljx-compile for
+                                ;; each build/files pair.
+                                (#'cljx.core/cljx-compile '~builds)))
+                (wt/watch))))))
 
 (defn cljx
   "Statically transform .cljx files into Clojure and ClojureScript sources."
