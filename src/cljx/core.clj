@@ -85,7 +85,12 @@ Returns a sequence of File objects, in breadth-first sort order."
                                      (require (symbol (namespace rules)))
                                      @(resolve rules))
                    :default (eval rules))]
-       (doseq [p source-paths]
+       (doseq [p source-paths
+               :let [abs-path (.getAbsolutePath (io/file p))] ]
          (if files
-           (generate (assoc build :rules rules :source-path p) files) 
+           (when-let [files (->> files
+                                 (filter #(.startsWith (.getAbsolutePath (io/file %)) abs-path))
+                                 seq)]
+             (generate (assoc build :rules rules :source-path p) files)) 
            (generate (assoc build :rules rules :source-path p))))))))
+
