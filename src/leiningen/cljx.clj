@@ -17,7 +17,7 @@
     (println "Watching" (vec dirs) "for changes.")
     (-> (wt/watcher* dirs)
         (wt/file-filter (wt/extensions :cljx))
-        (wt/rate 1000)
+        (wt/rate 250)
         (wt/on-change (fn [files] 
                         (cljx.core/cljx-compile builds :files files)))
         (wt/watch))))
