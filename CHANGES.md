@@ -1,5 +1,23 @@
 # changelog
 
+## [0.6.0](https://github.com/lynaghk/cljx/issues?q=milestone%3A0.6.0)
+
+* Fixed issue with `0.5.0` where either cljx or cljsbuild would be invoked
+  multiple times in the course of a build when run under Leiningen >= `2.4.2`.
+  (gh-61)
+* Fixed issue where cljx would not be invoked despite inclusion of it in
+  `:prep-tasks`. (gh-60)
+* Polling rate of `cljx auto` changed to 250ms (gh-46)
+
+The first of the above fixes necessitated a change in how cljx folds into the
+Leiningen "lifecycle" (now it is a "pure" plugin, and does not use `eval-in` at
+all). This is _technically_ a breaking change, in that any use of
+custom `:rules` in `:cljx` configuration resolved from project dependencies will
+break under `0.6.0`. The fix is to either change project configuration and/or
+refactor the definition of such `:rules` vars such that they are added to the
+project as `:plugin` dependencies (rather than "regular" `:dependencies`
+dependencies). [Terminology fail :-/]
+
 ## [0.5.0](https://github.com/lynaghk/cljx/issues?q=milestone%3A0.5.0)
 
 * cljx hooks have been eliminated (their use only emits a warning now), due to
