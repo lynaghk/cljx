@@ -1,4 +1,4 @@
-(defproject com.keminglabs/cljx "0.6.0-SNAPSHOT"
+(defproject com.keminglabs/cljx "0.6.0"
   :description "Static Clojure code rewriting"
   :url "http://github.com/lynaghk/cljx"
   :license {:name "BSD"
