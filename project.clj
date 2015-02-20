@@ -20,7 +20,7 @@
   :profiles {
              ; self-reference and chained `lein install; lein cleantest` invocation
              ; needed to use the project as its own plugin. Leiningen :-(
-             :self-plugin [:default {:plugins [[com.keminglabs/cljx "0.6.0-SNAPSHOT"]
+             :self-plugin [:default {:plugins [[com.keminglabs/cljx "0.6.0"]
                                                [com.cemerick/clojurescript.test "0.3.1"]]}]}
   
   :aliases {"cleantest" ["with-profile" "self-plugin" "do" "clean," "cljx" "once," "test"]}
