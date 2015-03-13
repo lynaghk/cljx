@@ -82,7 +82,7 @@ and configuration examples):
 * [schema](https://github.com/Prismatic/schema)
 * [formative](https://github.com/jkk/formative)
 * [pprng](https://github.com/cemerick/pprng/)
-* [sablano](https://github.com/r0man/sablono)
+* [sablono](https://github.com/r0man/sablono)
 * [double-check](https://github.com/cemerick/double-check)
 * [garden](https://github.com/noprompt/garden)
 * [hickory](https://github.com/davidsantiago/hickory)
