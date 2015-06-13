@@ -11,6 +11,25 @@
                  \______/
 
 
+# This plugin is deprecated
+
+After three years of auto-generating files on disk, cluttering up `project.clj` configurations, and otherwise being a useful but ugly hack, I am happy to announce that the reign of cljx is over: Clojure 1.7 brings us glorious [Reader Conditionals](http://dev.clojure.org/display/design/Reader+Conditionals) (AKA `.cljc` files).
+Reader Conditionals provide richer semantics than cljx like default expressions and form splicing.
+As an addition to the core language, Reader Conditionals have the vastly improved user experience of "no build tool configuration necessary".
+
+I encourage all projects that can use Clojure 1.7 or higher to use Reader Conditionals rather than cljx.
+Chas and I will not be doing additional work on cljx, but we are available for commerical support if you absolutely need it.
+
+For more details on cross-platform code rewriting and the historical context leading up to Reader Conditionals, see:
+
++ Reader Conditional design doc: http://dev.clojure.org/display/design/Reader+Conditionals
++ "Feature expressions - just because?" clojure-dev thread: https://groups.google.com/d/msg/clojure-dev/6pnIeXFRwnI/AGOQAwA2vrcJ
++ Alan Dipert's + Micha Niskin's "Feature Macros": https://groups.google.com/d/msg/clojure-dev/LW0ocQ1RcYI/PDOpmTBt-VIJ
+
+
+# README for deprecated plugin follows
+
+
 cljx is a [Leiningen](https://github.com/technomancy/leiningen) plugin and nREPL
 middleware that produces Clojure and ClojureScript code from a single annotated
 codebase.  Effectively, it is an s-expression preprocessor that yields either
