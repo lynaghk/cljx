@@ -1,6 +1,5 @@
 (ns cljx.plugin
   (:require [robert.hooke :as hooke]
-            leiningen.repl
             [clojure.java.io :as io]))
 
 (def cljx-coordinates
