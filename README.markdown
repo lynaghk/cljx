@@ -18,6 +18,9 @@ Reader Conditionals provide richer semantics than cljx like default expressions 
 As an addition to the core language, Reader Conditionals have the vastly improved user experience of "no build tool configuration necessary".
 
 I encourage all projects that can use Clojure 1.7 or higher to use Reader Conditionals rather than cljx.
+
+If you need reader conditional support for projects using Clojure 1.6 or earlier, see the [cljsee](https://github.com/aengelberg/cljsee) Leiningen plugin.
+
 Chas and I will not be doing additional work on cljx, but we are available for commerical support if you absolutely need it.
 
 For more details on cross-platform code rewriting and the historical context leading up to Reader Conditionals, see:
