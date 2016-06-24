@@ -131,6 +131,15 @@ To use it, add to the `:dev` profile in your `project.clj`:
                  :rules :cljs}]}
 ```
 
+When developing producing jarfiles intended to contain source, i.e. for libraries, etc., you will want to
+also add the following switch to the top level (probably NOT `:dev` profile):
+
+```clojure
+:auto-clean false
+```
+
+This prevents the "intermediate" .clj[s] files from being removed right before while jarfile creation.
+
 A more comprehensive configuration example can be found
 [here](https://github.com/lynaghk/cljx/blob/master/sample.project.clj).
 
