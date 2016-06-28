@@ -282,6 +282,8 @@ Macroexpansion occurs long after cljx touches your code.
 
 ### REPL Integration
 
+The nREPL middleware is **broken** for Leiningen **2.5.1**, see https://github.com/lynaghk/cljx/issues/66. `lein downgrade 2.5.0` is the quick fix.
+
 cljx provides an nREPL middleware that allows you to work with `.cljx` files in
 the same way you work with regular `.clj` files from any toolchain with good
 nREPL support, like [cider](https://github.com/clojure-emacs/cider),
